@@ -1,0 +1,62 @@
+﻿@model AltinZamani.Models.SiteSetting
+
+@{
+    ViewData["Title"] = "Sistem Ayarları";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0"><i class="bi bi-gear-fill"></i> Otomasyon Ayarları</h4>
+                </div>
+                <div class="card-body">
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <strong>Harika!</strong> @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form asp-controller="Admin" asp-action="Settings" method="post">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="mb-4">
+                            <label asp-for="ApiFetchIntervalInHours" class="form-label fw-bold">API Veri Çekme Sıklığı (Saat)</label>
+                            <div class="input-group">
+                                <input asp-for="ApiFetchIntervalInHours" type="number" class="form-control" min="1" max="24" required />
+                                <span class="input-group-text">Saatte Bir</span>
+                            </div>
+                            <small class="text-muted">Sistem, belirlediğiniz bu saat aralığında arka planda API'ye gidip verileri güncelleyecektir.</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="DataRetentionDays" class="form-label fw-bold">Geçmiş Verileri Saklama Süresi (Gün)</label>
+                            <div class="input-group">
+                                <input asp-for="DataRetentionDays" type="number" class="form-control" min="1" max="30" required />
+                                <span class="input-group-text">Gün</span>
+                            </div>
+                            <small class="text-muted">Belirttiğiniz günden daha eski olan veriler, her gece 01:00'da otomatik olarak silinir.</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="CleanupIntervalInHours" class="form-label fw-bold">Eski Veri Temizleme Sıklığı (Saat)</label>
+                            <div class="input-group">
+                                <input asp-for="CleanupIntervalInHours" type="number" class="form-control" min="1" max="72" required />
+                                <span class="input-group-text">Saatte Bir Çalıştır</span>
+                            </div>
+                            <small class="text-muted">Sistem, belirlediğiniz gün sayısından eski olan verileri bulup silmek için bu sıklıkta veritabanını tarar.</small>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Ayarları Kaydet ve Sistemi Güncelle</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

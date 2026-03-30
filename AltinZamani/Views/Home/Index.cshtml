@@ -3,15 +3,36 @@
 @{
     ViewData["Title"] = "Ana Sayfa - Canlı Piyasalar";
 
-    // Gelen verileri daha kolay ekrana basmak için kategorilere ayırıyoruz
+    // Gelen verileri kategorilere ayırıyoruz
     var kurlar = Model.Where(m => m.Name == "USD" || m.Name == "EUR" || m.Name == "GBP").ToList();
     var temelAltinlar = Model.Where(m => m.Name == "gram-altin" || m.Name == "ceyrek-altin" || m.Name == "ons").ToList();
     var digerAltinlar = Model.Where(m => !kurlar.Contains(m) && !temelAltinlar.Contains(m)).OrderByDescending(m => m.LastPrice).ToList();
+
+    // Controller'dan gelen aktif sembol ve kur bilgisi
+    string aktifSembol = ViewBag.SelectedCurrency == "TRY" ? "₺" : (ViewBag.CurrencySymbol ?? "₺");
+    string aktifKur = ViewBag.SelectedCurrency ?? "TRY";
 }
 
-<div class="text-center mb-5">
+<div class="text-center mb-4">
     <h1 class="display-4 fw-bold text-warning">Altın Zamanı</h1>
     <p class="lead">En güncel canlı altın ve döviz fiyatları</p>
+</div>
+
+<div class="d-flex justify-content-center mb-5">
+    <div class="btn-group shadow-sm" role="group" aria-label="Para Birimi Seçimi">
+        <a href="/?currency=TRY" class="btn btn-outline-primary @(aktifKur == "TRY" ? "active" : "") fw-bold">
+            TL (₺)
+        </a>
+        <a href="/?currency=USD" class="btn btn-outline-success @(aktifKur == "USD" ? "active" : "") fw-bold">
+            USD ($)
+        </a>
+        <a href="/?currency=EUR" class="btn btn-outline-info @(aktifKur == "EUR" ? "active" : "") fw-bold">
+            EUR (€)
+        </a>
+        <a href="/?currency=GBP" class="btn btn-outline-warning @(aktifKur == "GBP" ? "active" : "") fw-bold">
+            GBP (£)
+        </a>
+    </div>
 </div>
 
 @if (!Model.Any())
@@ -25,17 +46,18 @@ else
     <div class="row mb-4">
         @foreach (var item in temelAltinlar.Concat(kurlar))
         {
-            // Değişim yönüne göre renk belirliyoruz (Yeşil veya Kırmızı)
             string colorClass = item.ChangePercentage >= 0 ? "text-success" : "text-danger";
             string iconClass = item.ChangePercentage >= 0 ? "▲" : "▼";
-            // İsimleri biraz daha okunaklı yapalım
             string displayName = item.Name.ToUpper().Replace("-", " ");
 
             <div class="col-md-4 col-sm-6 mb-3">
                 <div class="card shadow-sm border-0 h-100">
                     <div class="card-body text-center">
                         <h5 class="card-title text-muted">@displayName</h5>
-                        <h2 class="card-text fw-bold">@item.LastPrice.ToString("N4") ₺</h2>
+                        @* Fiyat formatını seçilen kura göre ayarlıyoruz *@
+                        <h2 class="card-text fw-bold">
+                            @aktifSembol@item.LastPrice.ToString(aktifKur == "TRY" ? "N2" : "N4")
+                        </h2>
                         <p class="card-text @colorClass fw-bold fs-5">
                             @iconClass %@item.ChangePercentage.ToString("N2")
                         </p>
@@ -46,8 +68,9 @@ else
     </div>
 
     <div class="card shadow border-0">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">Tüm Piyasa Verileri (Altın & Diğer)</h5>
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Tüm Piyasa Verileri</h5>
+            <span class="badge bg-primary">Birim: @aktifKur</span>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -55,7 +78,7 @@ else
                     <thead class="table-light">
                         <tr>
                             <th>Birim Adı</th>
-                            <th class="text-end">Son Fiyat</th>
+                            <th class="text-end">Son Fiyat (@aktifSembol)</th>
                             <th class="text-end">Günlük Değişim</th>
                             <th class="text-end">Son Güncelleme</th>
                         </tr>
@@ -68,7 +91,7 @@ else
 
                             <tr>
                                 <td class="fw-bold">@displayName</td>
-                                <td class="text-end fw-bold">@item.LastPrice.ToString("N4")</td>
+                                <td class="text-end fw-bold">@item.LastPrice.ToString(aktifKur == "TRY" ? "N2" : "N4")</td>
                                 <td class="text-end @colorClass fw-bold">
                                     %@item.ChangePercentage.ToString("N2")
                                 </td>

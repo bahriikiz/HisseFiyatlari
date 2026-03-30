@@ -17,31 +17,58 @@ namespace AltinZamani.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string currency = "TRY")
         {
             var bugun = DateTime.Today;
 
-            // Bugünün 'altinzamani' verilerini veritabanýndan çekiyoruz
+            // 1. Tüm güncel verileri çekiyoruz (Hepsi TL bazýnda)
             var marketData = _context.MarketDatas
                 .Where(m => m.SiteType == "altinzamani" && m.RecordDate.Date == bugun)
-                // Eðer ayný gün içinde birden fazla veri varsa, en son çekileni baz almasý için grupluyoruz
                 .GroupBy(m => m.Name)
                 .Select(g => g.OrderByDescending(m => m.RecordDate).First())
                 .ToList();
 
-            // Verileri Index.cshtml sayfasýna gönderiyoruz
+            decimal bolenDeger = 1;
+            string sembol = "?";
+
+            // 2. Eðer kullanýcý TL dýþýnda bir kur seçtiyse hesaplama yapýyoruz
+            if (currency != "TRY")
+            {
+                var secilenDoviz = marketData.FirstOrDefault(m => m.Name == currency);
+
+                if (secilenDoviz != null && secilenDoviz.LastPrice > 0)
+                {
+                    bolenDeger = secilenDoviz.LastPrice;
+                    sembol = currency switch
+                    {
+                        "USD" => "$",
+                        "EUR" => "€",
+                        "GBP" => "£",
+                        _ => currency
+                    };
+                }
+                else
+                {
+                    currency = "TRY"; // Eðer kur bulunamazsa güvenliðe alýp TL'ye dön
+                }
+            }
+
+            // 3. Fiyatlarý seçilen kura göre bölüþtürüyoruz
+            if (bolenDeger != 1)
+            {
+                foreach (var item in marketData)
+                {
+                    // Temel dövizleri (USD seçiliyken USD'yi vs.) 1'e eþitlememek için ufak bir kontrol eklenebilir
+                    // Ama genel mantýkta her þey o kura bölünür.
+                    item.LastPrice = item.LastPrice / bolenDeger;
+                }
+            }
+
+            // Seçilen kuru ve sembolü arayüze (View) gönderiyoruz ki butonlarý boyayabilelim
+            ViewBag.SelectedCurrency = currency;
+            ViewBag.CurrencySymbol = sembol;
+
             return View(marketData);
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
