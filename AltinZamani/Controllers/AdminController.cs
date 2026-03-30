@@ -40,29 +40,33 @@ namespace AltinZamani.Controllers
             var setting = _context.SiteSettings.FirstOrDefault();
             if (setting != null)
             {
-                // 1. Veritabanındaki ayarları senin formdan gönderdiklerinle güncelle
+                // Sadece gerekli olanları güncelliyoruz
                 setting.ApiFetchIntervalInHours = model.ApiFetchIntervalInHours;
                 setting.DataRetentionDays = model.DataRetentionDays;
-                setting.CleanupIntervalInHours = model.CleanupIntervalInHours;
+
+                // Diğer SEO ve İletişim alanlarını da burada güncellediğinden emin ol (Örn: setting.MetaTitle = model.MetaTitle vb.)
+
                 _context.SaveChanges();
 
-                // 2. API VERİ ÇEKME TAKVİMİNİ GÜNCELLE
-                string apiCron = $"0 */{model.ApiFetchIntervalInHours} * * *";
+                // 1. API VERİ ÇEKME GÖREVİ (Hata Korumalı)
+                string apiCron = model.ApiFetchIntervalInHours >= 24
+                    ? "0 0 * * *"
+                    : $"0 */{model.ApiFetchIntervalInHours} * * *";
+
                 _recurringJobManager.AddOrUpdate<MarketDataService>(
                     "api-veri-cekme-gorevi",
                     service => service.FetchAndSaveMarketDataAsync(),
                     apiCron
                 );
 
-                // 3. ESKİ VERİ TEMİZLEME TAKVİMİNİ GÜNCELLE 
-                string cleanupCron = $"0 */{model.CleanupIntervalInHours} * * *";
+                // 2. TEMİZLİK GÖREVİ (Sabit her gece 01:00)
                 _recurringJobManager.AddOrUpdate<MarketDataService>(
                     "eski-verileri-temizleme-gorevi",
                     service => service.CleanUpOldDataAsync(),
-                    cleanupCron
+                    "0 1 * * *"
                 );
 
-                TempData["SuccessMessage"] = "Tüm sistem ayarları başarıyla kaydedildi ve Hangfire otomasyon takvimleri güncellendi!";
+                TempData["SuccessMessage"] = "Ayarlar kaydedildi.";
             }
 
             return View(setting);

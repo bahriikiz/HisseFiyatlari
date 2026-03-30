@@ -20,5 +20,9 @@ namespace AltinZamani.Models
         public int ApiFetchIntervalInHours { get; set; } = 2;
         public int DataRetentionDays { get; set; } = 5;
         public int CleanupIntervalInHours { get; set; } = 24;
+        // --- SEO Ayarları ---
+        public string? MetaTitle { get; set; } = "Altın Zamanı - Canlı Altın ve Döviz Fiyatları";
+        public string? MetaDescription { get; set; } = "En güncel altın fiyatları, çeyrek altın, gram altın ve canlı döviz kurlarını anlık takip edin.";
+        public string? MetaKeywords { get; set; } = "altın, çeyrek altın, gram altın, döviz, canlı borsa, dolar, euro";
     }
 }

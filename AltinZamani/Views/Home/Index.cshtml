@@ -18,20 +18,12 @@
     <p class="lead">En güncel canlı altın ve döviz fiyatları</p>
 </div>
 
-<div class="d-flex justify-content-center mb-5">
+<div class="d-flex justify-content-center mb-4">
     <div class="btn-group shadow-sm" role="group" aria-label="Para Birimi Seçimi">
-        <a href="/?currency=TRY" class="btn btn-outline-primary @(aktifKur == "TRY" ? "active" : "") fw-bold">
-            TL (₺)
-        </a>
-        <a href="/?currency=USD" class="btn btn-outline-success @(aktifKur == "USD" ? "active" : "") fw-bold">
-            USD ($)
-        </a>
-        <a href="/?currency=EUR" class="btn btn-outline-info @(aktifKur == "EUR" ? "active" : "") fw-bold">
-            EUR (€)
-        </a>
-        <a href="/?currency=GBP" class="btn btn-outline-warning @(aktifKur == "GBP" ? "active" : "") fw-bold">
-            GBP (£)
-        </a>
+        <a href="/?currency=TRY" class="btn btn-outline-primary @(aktifKur == "TRY" ? "active" : "") fw-bold">TL (₺)</a>
+        <a href="/?currency=USD" class="btn btn-outline-success @(aktifKur == "USD" ? "active" : "") fw-bold">USD ($)</a>
+        <a href="/?currency=EUR" class="btn btn-outline-info @(aktifKur == "EUR" ? "active" : "") fw-bold">EUR (€)</a>
+        <a href="/?currency=GBP" class="btn btn-outline-warning @(aktifKur == "GBP" ? "active" : "") fw-bold">GBP (£)</a>
     </div>
 </div>
 
@@ -43,6 +35,20 @@
 }
 else
 {
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow border-0">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-dark">Gram Altın - Son 24 Saatlik Değişim</h5>
+                    <span class="badge bg-success">Canlı Takip</span>
+                </div>
+                <div class="card-body">
+                    <canvas id="goldChart" style="max-height: 350px; width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row mb-4">
         @foreach (var item in temelAltinlar.Concat(kurlar))
         {
@@ -54,7 +60,6 @@ else
                 <div class="card shadow-sm border-0 h-100">
                     <div class="card-body text-center">
                         <h5 class="card-title text-muted">@displayName</h5>
-                        @* Fiyat formatını seçilen kura göre ayarlıyoruz *@
                         <h2 class="card-text fw-bold">
                             @aktifSembol@item.LastPrice.ToString(aktifKur == "TRY" ? "N2" : "N4")
                         </h2>
@@ -103,4 +108,64 @@ else
             </div>
         </div>
     </div>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const ctx = document.getElementById('goldChart').getContext('2d');
+
+            // Gram Altın verilerini çekip grafiğe basıyoruz
+            fetch('/Home/GetChartData?name=gram-altin')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) return;
+
+                    const labels = data.map(item => item.time);
+                    const prices = data.map(item => item.price);
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Gram Altın Fiyatı',
+                                data: prices,
+                                borderColor: '#ffc107',
+                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4, // Çizgiyi kavisli yapar
+                                pointRadius: 3,
+                                pointBackgroundColor: '#ffc107'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.parsed.y.toLocaleString() + ' @aktifSembol';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    ticks: {
+                                        callback: function(value) { return value.toLocaleString(); }
+                                    }
+                                },
+                                x: { grid: { display: false } }
+                            }
+                        }
+                    });
+                });
+        });
+    </script>
 }

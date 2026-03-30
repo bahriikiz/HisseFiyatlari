@@ -1,6 +1,7 @@
-using AltinZamani.Data;
+ï»¿using AltinZamani.Data;
 using AltinZamani.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace AltinZamani.Controllers
@@ -10,7 +11,6 @@ namespace AltinZamani.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
 
-        // Veritabaný baðlantýmýzý (ApplicationDbContext) Controller'a enjekte ediyoruz
         public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
@@ -19,22 +19,22 @@ namespace AltinZamani.Controllers
 
         public IActionResult Index(string currency = "TRY")
         {
-            var bugun = DateTime.Today;
+            // Son 24 saat iÃ§indeki en gÃ¼ncel verileri alÄ±yoruz (Today yerine 24 saat daha gÃ¼venlidir)
+            var son24Saat = DateTime.Now.AddHours(-24);
 
-            // 1. Tüm güncel verileri çekiyoruz (Hepsi TL bazýnda)
             var marketData = _context.MarketDatas
-                .Where(m => m.SiteType == "altinzamani" && m.RecordDate.Date == bugun)
+                .Where(m => m.SiteType == "altinzamani" && m.RecordDate >= son24Saat)
+                .AsEnumerable() // Gruplama iÅŸlemini bellek Ã¼zerinde yaparak performans ve uyumluluk saÄŸlÄ±yoruz
                 .GroupBy(m => m.Name)
                 .Select(g => g.OrderByDescending(m => m.RecordDate).First())
                 .ToList();
 
             decimal bolenDeger = 1;
-            string sembol = "?";
+            string sembol = "TL"; // â‚º sembolÃ¼ yerine soru iÅŸareti hatasÄ±nÄ± Ã¶nlemek iÃ§in TL yazdÄ±k
 
-            // 2. Eðer kullanýcý TL dýþýnda bir kur seçtiyse hesaplama yapýyoruz
             if (currency != "TRY")
             {
-                var secilenDoviz = marketData.FirstOrDefault(m => m.Name == currency);
+                var secilenDoviz = marketData.FirstOrDefault(m => m.Name.Equals(currency, StringComparison.OrdinalIgnoreCase));
 
                 if (secilenDoviz != null && secilenDoviz.LastPrice > 0)
                 {
@@ -42,33 +42,60 @@ namespace AltinZamani.Controllers
                     sembol = currency switch
                     {
                         "USD" => "$",
-                        "EUR" => "€",
-                        "GBP" => "£",
+                        "EUR" => "â‚¬",
+                        "GBP" => "Â£",
                         _ => currency
                     };
                 }
                 else
                 {
-                    currency = "TRY"; // Eðer kur bulunamazsa güvenliðe alýp TL'ye dön
+                    currency = "TRY";
                 }
             }
 
-            // 3. Fiyatlarý seçilen kura göre bölüþtürüyoruz
+            // Fiyat dÃ¶nÃ¼ÅŸtÃ¼rme iÅŸlemi
             if (bolenDeger != 1)
             {
                 foreach (var item in marketData)
                 {
-                    // Temel dövizleri (USD seçiliyken USD'yi vs.) 1'e eþitlememek için ufak bir kontrol eklenebilir
-                    // Ama genel mantýkta her þey o kura bölünür.
                     item.LastPrice = item.LastPrice / bolenDeger;
                 }
             }
 
-            // Seçilen kuru ve sembolü arayüze (View) gönderiyoruz ki butonlarý boyayabilelim
             ViewBag.SelectedCurrency = currency;
             ViewBag.CurrencySymbol = sembol;
 
             return View(marketData);
+        }
+
+        // --- GRAFÄ°K Ä°Ã‡Ä°N YENÄ° EKLENEN METOT ---
+        [HttpGet]
+        public IActionResult GetChartData(string name = "gram-altin")
+        {
+            // Son 24 saatlik fiyat geÃ§miÅŸini getirir
+            var limit = DateTime.Now.AddHours(-24);
+
+            var history = _context.MarketDatas
+                .Where(m => m.Name == name && m.RecordDate >= limit)
+                .OrderBy(m => m.RecordDate)
+                .Select(m => new {
+                    price = m.LastPrice,
+                    time = m.RecordDate.ToString("HH:mm")
+                })
+                .ToList();
+
+            return Json(history);
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
