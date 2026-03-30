@@ -21,5 +21,6 @@ namespace AltinZamani.Models
         public bool IsInstagramActive { get; set; }
         public int ApiFetchIntervalInHours { get; set; } = 2;
         public int DataRetentionsDays { get; set; } = 5;
+        public int DataRetentionDays { get; internal set; }
     }
 }
