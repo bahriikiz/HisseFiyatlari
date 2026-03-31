@@ -28,23 +28,21 @@
                         <div class="mb-3">
                             <label asp-for="MetaTitle" class="form-label fw-bold">Site Başlığı (Title)</label>
                             <input asp-for="MetaTitle" class="form-control" placeholder="Google'da görünecek ana başlık" />
-                            <small class="text-muted">Örn: Altın Zamanı - Canlı Altın ve Döviz Fiyatları</small>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="MetaDescription" class="form-label fw-bold">Site Açıklaması (Description)</label>
-                            <textarea asp-for="MetaDescription" class="form-control" rows="3" placeholder="Sitenizi anlatan kısa bir özet yazın..."></textarea>
-                            <small class="text-muted">Arama sonuçlarında başlığın altında çıkan açıklama metni.</small>
+                            <textarea asp-for="MetaDescription" class="form-control" rows="3" placeholder="Sitenizi anlatan özet..."></textarea>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label asp-for="MetaKeywords" class="form-label fw-bold">Anahtar Kelimeler</label>
-                                <input asp-for="MetaKeywords" class="form-control" placeholder="altın, döviz, canlı kur" />
+                                <input asp-for="MetaKeywords" class="form-control" />
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label asp-for="AnalyticsCode" class="form-label fw-bold">Google Analytics (G-XXXXX)</label>
-                                <input asp-for="AnalyticsCode" class="form-control" placeholder="G-12345678" />
+                                <input asp-for="AnalyticsCode" class="form-control" />
                             </div>
                         </div>
                     </div>
@@ -56,23 +54,52 @@
                     </div>
                     <div class="card-body p-4">
                         <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="ApiFetchIntervalInHours" class="form-label fw-bold">API Çekme Sıklığı</label>
-                                <div class="input-group">
-                                    <input asp-for="ApiFetchIntervalInHours" type="number" class="form-control" min="1" max="24" />
-                                    <span class="input-group-text">Saat</span>
-                                </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ApiFetchIntervalInHours" class="form-label fw-bold">API Çekme Sıklığı (Saat)</label>
+                                <input asp-for="ApiFetchIntervalInHours" type="number" class="form-control" />
                             </div>
-                           
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="DataRetentionDays" class="form-label fw-bold">Veri Saklama</label>
-                                <div class="input-group">
-                                    <input asp-for="DataRetentionDays" type="number" class="form-control" min="1" max="30" />
-                                    <span class="input-group-text">Gün</span>
-                                </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DataRetentionDays" class="form-label fw-bold">Veri Saklama Süresi (Gün)</label>
+                                <input asp-for="DataRetentionDays" type="number" class="form-control" />
                             </div>
                         </div>
-                        <small class="text-muted fst-italic">Not: API sıklığı değiştiğinde Hangfire görevleri anlık olarak güncellenir.</small>
+                    </div>
+                </div>
+
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-header bg-warning text-dark py-3">
+                        <h5 class="mb-0"><i class="bi bi-layout-three-columns"></i> Reklam Yerleşim Merkezi</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label asp-for="AdsenseCode" class="form-label fw-bold text-primary">Global AdSense Kodu (Header Script)</label>
+                            <textarea asp-for="AdsenseCode" class="form-control" rows="2" placeholder="Auto-Ads script kodu buraya..."></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="TopAdCode" class="form-label fw-bold text-danger">Tepe Reklam Alanı (Navbar Altı - 728x90)</label>
+                            <textarea asp-for="TopAdCode" class="form-control" rows="2" placeholder="Tepe banner kodu..."></textarea>
+                        </div>
+
+                        <hr />
+
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LeftAdCode" class="form-label fw-bold text-success">Sol Kenar Reklamı (Dikey)</label>
+                                <textarea asp-for="LeftAdCode" class="form-control" rows="4" placeholder="Sol dikey reklam kodu..."></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RightAdCode" class="form-label fw-bold text-success">Sağ Kenar Reklamı (Dikey)</label>
+                                <textarea asp-for="RightAdCode" class="form-control" rows="4" placeholder="Sağ dikey reklam kodu..."></textarea>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="mb-0">
+                            <label asp-for="BannerAdCode" class="form-label fw-bold text-primary">Ana Sayfa - Grafik Üstü Banner</label>
+                            <textarea asp-for="BannerAdCode" class="form-control" rows="2" placeholder="Yatay banner kodu..."></textarea>
+                        </div>
                     </div>
                 </div>
 
@@ -81,18 +108,47 @@
                         <h5 class="mb-0"><i class="bi bi-share-fill"></i> İletişim ve Sosyal Medya</h5>
                     </div>
                     <div class="card-body p-4">
-                        <div class="mb-3">
-                            <label asp-for="ContactEmail" class="form-label fw-bold">İletişim E-posta</label>
-                            <input asp-for="ContactEmail" class="form-control" type="email" />
-                        </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
+                                <label asp-for="ContactEmail" class="form-label fw-bold">İletişim E-posta</label>
+                                <input asp-for="ContactEmail" class="form-control" type="email" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FooterText" class="form-label fw-bold">Footer Yazısı</label>
+                                <input asp-for="FooterText" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
                                 <label asp-for="InstagramUrl" class="form-label fw-bold">Instagram URL</label>
                                 <input asp-for="InstagramUrl" class="form-control" />
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label asp-for="TwitterUrl" class="form-label fw-bold">Twitter URL</label>
                                 <input asp-for="TwitterUrl" class="form-control" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="FacebookUrl" class="form-label fw-bold">Facebook URL</label>
+                                <input asp-for="FacebookUrl" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-header bg-danger text-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Güvenlik Ayarları (Giriş Bilgileri)</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AdminUsername" class="form-label fw-bold">Yönetici Kullanıcı Adı</label>
+                                <input asp-for="AdminUsername" class="form-control" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AdminPassword" class="form-label fw-bold">Yönetici Şifresi</label>
+                                <input asp-for="AdminPassword" type="text" class="form-control" required />
+                                <small class="text-muted">Şifrenizi unutursanız veritabanından müdahale etmeniz gerekir, dikkatli değiştirin!</small>
                             </div>
                         </div>
                     </div>

@@ -97,5 +97,18 @@ namespace AltinZamani.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+    
+    [HttpGet]
+        public IActionResult SetLanguage(string culture, string returnUrl = "/")
+        {
+            // Kullanıcının seçtiği dili tarayıcıya 1 yıllığına kaydediyoruz
+            Response.Cookies.Append("SiteLanguage", culture, new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddYears(1)
+            });
+
+            // Kullanıcıyı geldiği sayfaya geri gönderiyoruz
+            return LocalRedirect(returnUrl);
+        }
     }
 }

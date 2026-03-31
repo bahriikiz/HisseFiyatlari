@@ -2,8 +2,17 @@ using AltinZamani.Data;
 using AltinZamani.Services;
 using Microsoft.EntityFrameworkCore;
 using Hangfire;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Admin/Login"; 
+        options.LogoutPath = "/Admin/Logout";
+        options.ExpireTimeSpan = TimeSpan.FromHours(1); // 1 saat boþta kalýrsa at
+    });
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -27,7 +36,7 @@ builder.Services.AddHangfire(configuration => configuration
 
 // Hangfire arka plan iþleyicisini (Sunucusunu) baþlatýyoruz
 builder.Services.AddHangfireServer();
-// ---------------------------------------------------------------------
+
 
 var app = builder.Build();
 
@@ -42,6 +51,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseHangfireDashboard("/hangfire");
@@ -64,7 +74,7 @@ using (var scope = app.Services.CreateScope())
         Cron.Daily(7, 0)
     );
 }
-// -------------------------------------------------------------
+
 
 app.MapControllerRoute(
     name: "default",

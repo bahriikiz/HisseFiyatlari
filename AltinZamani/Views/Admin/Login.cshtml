@@ -1,0 +1,38 @@
+﻿@{
+    ViewData["Title"] = "Admin Girişi";
+    Layout = "_Layout"; 
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                <div class="card-header bg-dark text-white text-center py-4">
+                    <h3 class="font-weight-light my-2"><i class="bi bi-shield-lock-fill"></i> Yönetici Girişi</h3>
+                </div>
+                <div class="card-body p-4">
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger shadow-sm"><i class="bi bi-exclamation-triangle-fill"></i> @ViewBag.Error</div>
+                    }
+
+                    <form asp-controller="Admin" asp-action="Login" method="post">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Kullanıcı Adı" required />
+                            <label for="username">Kullanıcı Adı</label>
+                        </div>
+                        <div class="form-floating mb-4">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Şifre" required />
+                            <label for="password">Şifre</label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary btn-lg" type="submit">Giriş Yap <i class="bi bi-box-arrow-in-right"></i></button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

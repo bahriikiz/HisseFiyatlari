@@ -3,19 +3,38 @@
 @{
     ViewData["Title"] = "Ana Sayfa - Canlı Piyasalar";
 
-    // Gelen verileri kategorilere ayırıyoruz
     var kurlar = Model.Where(m => m.Name == "USD" || m.Name == "EUR" || m.Name == "GBP").ToList();
     var temelAltinlar = Model.Where(m => m.Name == "gram-altin" || m.Name == "ceyrek-altin" || m.Name == "ons").ToList();
     var digerAltinlar = Model.Where(m => !kurlar.Contains(m) && !temelAltinlar.Contains(m)).OrderByDescending(m => m.LastPrice).ToList();
 
-    // Controller'dan gelen aktif sembol ve kur bilgisi
     string aktifSembol = ViewBag.SelectedCurrency == "TRY" ? "₺" : (ViewBag.CurrencySymbol ?? "₺");
     string aktifKur = ViewBag.SelectedCurrency ?? "TRY";
-}
 
+    // Dili Okuyoruz
+    string lang = Context.Request.Cookies["SiteLanguage"] ?? "tr";
+    bool isEn = lang == "en";
+
+    // Altın isimlerini İngilizceye çeviren ufak bir fonksiyon
+    string TranslateName(string name)
+    {
+        if (!isEn) return name.ToUpper().Replace("-", " ");
+
+        return name switch
+        {
+            "gram-altin" => "GRAM GOLD",
+            "ceyrek-altin" => "QUARTER GOLD",
+            "yarim-altin" => "HALF GOLD",
+            "tam-altin" => "FULL GOLD",
+            "cumhuriyet-altini" => "REPUBLIC GOLD",
+            "ons" => "OUNCE",
+            "gumus" => "SILVER",
+            _ => name.ToUpper().Replace("-", " ")
+        };
+    }
+}
 <div class="text-center mb-4">
-    <h1 class="display-4 fw-bold text-warning">Altın Zamanı</h1>
-    <p class="lead">En güncel canlı altın ve döviz fiyatları</p>
+    <h1 class="display-4 fw-bold text-warning">@(isEn ? "Golden Time" : "Altın Zamanı")</h1>
+    <p class="lead">@(isEn ? "The most up-to-date live gold and currency prices" : "En güncel canlı altın ve döviz fiyatları")</p>
 </div>
 
 <div class="d-flex justify-content-center mb-4">
@@ -39,8 +58,8 @@ else
         <div class="col-12">
             <div class="card shadow border-0">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold text-dark">Gram Altın - Son 24 Saatlik Değişim</h5>
-                    <span class="badge bg-success">Canlı Takip</span>
+                    <h5 class="mb-0 fw-bold text-dark">@(isEn ? "Gram Gold - Last 24 Hours" : "Gram Altın - Son 24 Saatlik Değişim")</h5>
+                    <span class="badge bg-success">@(isEn ? "Live" : "Canlı Takip")</span>
                 </div>
                 <div class="card-body">
                     <canvas id="goldChart" style="max-height: 350px; width: 100%;"></canvas>
@@ -74,7 +93,7 @@ else
 
     <div class="card shadow border-0">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Tüm Piyasa Verileri</h5>
+            <h5 class="mb-0">@(isEn ? "All Market Data" : "Tüm Piyasa Verileri")</h5>
             <span class="badge bg-primary">Birim: @aktifKur</span>
         </div>
         <div class="card-body p-0">
@@ -82,10 +101,10 @@ else
                 <table class="table table-hover table-striped mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>Birim Adı</th>
-                            <th class="text-end">Son Fiyat (@aktifSembol)</th>
-                            <th class="text-end">Günlük Değişim</th>
-                            <th class="text-end">Son Güncelleme</th>
+                            <th>@(isEn ? "Asset Name" : "Birim Adı")</th>
+                            <th class="text-end">@(isEn ? "Last Price" : "Son Fiyat") (@aktifSembol)</th>
+                            <th class="text-end">@(isEn ? "Daily Change" : "Günlük Değişim")</th>
+                            <th class="text-end">@(isEn ? "Last Update" : "Son Güncelleme")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -106,6 +125,19 @@ else
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+}
+@inject AltinZamani.Data.ApplicationDbContext _context
+@{
+    var settings = _context.SiteSettings.FirstOrDefault();
+}
+
+@if (settings != null && !string.IsNullOrEmpty(settings.BannerAdCode))
+{
+    <div class="container text-center mb-4">
+        <div class="d-inline-block shadow-sm p-1 bg-white rounded border">
+            @Html.Raw(settings.BannerAdCode)
         </div>
     </div>
 }

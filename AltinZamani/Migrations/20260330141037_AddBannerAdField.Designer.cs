@@ -4,6 +4,7 @@ using AltinZamani.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AltinZamani.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260330141037_AddBannerAdField")]
+    partial class AddBannerAdField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,14 +101,6 @@ namespace AltinZamani.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdminPassword")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AdminUsername")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("AdsenseCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -145,9 +140,6 @@ namespace AltinZamani.Migrations
                     b.Property<bool>("IsTwitterActive")
                         .HasColumnType("bit");
 
-                    b.Property<string>("LeftAdCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("MetaDescription")
                         .HasColumnType("nvarchar(max)");
 
@@ -157,13 +149,7 @@ namespace AltinZamani.Migrations
                     b.Property<string>("MetaTitle")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RightAdCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("SiteType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TopAdCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TwitterUrl")
