@@ -105,11 +105,6 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
                 .Where(m => m.RecordDate.Date == today && m.SiteType == "altinzamani")
                 .ToListAsync();
 
-            if (todaysExistingData.Any())
-            {
-                context.MarketDatas.RemoveRange(todaysExistingData);
-            }
-
             await context.MarketDatas.AddRangeAsync(fetchedData);
             await context.SaveChangesAsync();
         }

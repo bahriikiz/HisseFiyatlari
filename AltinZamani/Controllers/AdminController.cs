@@ -10,17 +10,20 @@ using System.Security.Claims;
 
 namespace AltinZamani.Controllers
 {
-    // YENİ: Bu sınıfa girmek için artık kimlik şart!
+    // AdminController, site yöneticisinin giriş yapabileceği, ayarları yönetebileceği ve manuel veri çekme işlemi yapabileceği sayfaları içerir.
     [Authorize]
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IRecurringJobManager _recurringJobManager;
+        private readonly MarketDataService _marketDataService;
 
-        public AdminController(ApplicationDbContext context, IRecurringJobManager recurringJobManager)
+        // Constructor ile gerekli servisleri alıyoruz
+        public AdminController(ApplicationDbContext context, IRecurringJobManager recurringJobManager, MarketDataService marketDataService)
         {
             _context = context;
             _recurringJobManager = recurringJobManager;
+            _marketDataService = marketDataService;
         }
 
         // --- GİRİŞ YAPMA SAYFASI (Buraya herkes girebilir) ---
@@ -35,6 +38,23 @@ namespace AltinZamani.Controllers
             return View();
         }
 
+        // --- MANUEL VERİ ÇEKME TETİKLEYİCİSİ ---
+        [HttpPost]
+        public async Task<IActionResult> TriggerManualFetch()
+        {
+            try
+            {
+                await _marketDataService.FetchAndSaveMarketDataAsync();
+                TempData["SuccessMessage"] = "Manuel veri çekme işlemi tetiklendi! Veritabanına o anki fiyatlar başarıyla eklendi.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Veri çekilirken hata oluştu: {ex.Message}";
+            }
+
+            return RedirectToAction("Settings");
+        }
+
         // --- GİRİŞ YAPMA İŞLEMİ ---
         [AllowAnonymous]
         [HttpPost]
@@ -42,8 +62,10 @@ namespace AltinZamani.Controllers
         {
             // Veritabanından güncel şifreyi çekiyoruz 
             var settings = _context.SiteSettings.FirstOrDefault();
-            string dbUser = settings?.AdminUsername;
-            string dbPass = settings?.AdminPassword;
+
+            // Eğer veritabanı boşsa varsayılan olarak admin / altin2026 kabul et
+            string dbUser = settings?.AdminUsername ?? "admin";
+            string dbPass = settings?.AdminPassword ?? "altin2026";
 
             // Artık veritabanındaki bilgilerle eşleşiyorsa giriş yapacak!
             if (username == dbUser && password == dbPass)
@@ -85,7 +107,9 @@ namespace AltinZamani.Controllers
                     ApiFetchIntervalInHours = 2,
                     DataRetentionDays = 5,
                     MetaTitle = "Altın Zamanı - Canlı Altın ve Döviz",
-                    MetaDescription = "Anlık altın fiyatları ve döviz kurları."
+                    MetaDescription = "Anlık altın fiyatları ve döviz kurları.",
+                    AdminUsername = "admin",
+                    AdminPassword = "altin2026"
                 };
                 _context.SiteSettings.Add(setting);
                 _context.SaveChanges();
@@ -125,7 +149,7 @@ namespace AltinZamani.Controllers
                 setting.TwitterUrl = model.TwitterUrl;
                 setting.FacebookUrl = model.FacebookUrl;
 
-                // 5.Admin Bilgileri
+                // 5. Admin Bilgileri
                 setting.AdminUsername = model.AdminUsername;
                 setting.AdminPassword = model.AdminPassword;
 
