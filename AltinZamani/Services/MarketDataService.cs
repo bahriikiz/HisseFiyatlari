@@ -2,118 +2,140 @@
 using AltinZamani.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using Microsoft.Extensions.Configuration; 
 
 namespace AltinZamani.Services;
 
-public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataService> logger, HttpClient httpClient)
+public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataService> logger, HttpClient httpClient, IConfiguration configuration)
 {
     public async Task FetchAndSaveMarketDataAsync()
     {
-        // 1. Bot engeline takılmamak için tarayıcı kimliği
+        SetupHttpClient();
+
+        string apiUrl = configuration["MarketApi:Url"] ?? "https://finans.truncgil.com/today.json";
+
+        var jsonString = await FetchJsonFromApiAsync(apiUrl);
+
+        using var doc = ParseJsonDocument(jsonString);
+        var fetchedData = ExtractMarketData(doc.RootElement);
+
+        if (fetchedData.Count == 0)
+        {
+            throw new InvalidOperationException("JSON başarıyla okundu ancak listeye eklenecek geçerli hiçbir fiyat bulunamadı!");
+        }
+
+        await context.MarketDatas.AddRangeAsync(fetchedData);
+        await context.SaveChangesAsync();
+    }
+
+    private void SetupHttpClient()
+    {
         httpClient.DefaultRequestHeaders.Clear();
         httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+    }
 
-        // 2. V4 yerine EN STABİL ana sürümü kullanıyoruz!
-        string apiUrl = "https://finans.truncgil.com/today.json";
-
+    private async Task<string> FetchJsonFromApiAsync(string apiUrl)
+    {
         var response = await httpClient.GetAsync(apiUrl);
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"API ulaşılamaz durumda! HTTP Kodu: {response.StatusCode}");
+            throw new HttpRequestException($"API ulaşılamaz durumda! HTTP Kodu: {response.StatusCode}");
         }
 
         var jsonString = await response.Content.ReadAsStringAsync();
 
-        if (string.IsNullOrWhiteSpace(jsonString) || !jsonString.TrimStart().StartsWith("{"))
+        if (string.IsNullOrWhiteSpace(jsonString) || !jsonString.TrimStart().StartsWith('{'))
         {
-            throw new Exception("API'den JSON formatında veri gelmedi!");
+            throw new InvalidDataException("API'den JSON formatında veri gelmedi!");
         }
 
-        JsonDocument doc;
+        return jsonString;
+    }
+
+    private static JsonDocument ParseJsonDocument(string jsonString)
+    {
         try
         {
-            // 3. Eksik/Bozuk JSON gelirse sistemi çökertmeden hatayı yakalıyoruz
-            doc = JsonDocument.Parse(jsonString);
+            return JsonDocument.Parse(jsonString);
         }
         catch (JsonException ex)
         {
-            // Hata verirse Hangfire'a düşecek ve verinin ne kadarının geldiğini göreceğiz
-            throw new Exception($"API veriyi yarım gönderdi! Hata: {ex.Message} | Gelen Veri Uzunluğu: {jsonString.Length}");
+            throw new InvalidDataException($"API veriyi yarım gönderdi! Gelen Veri Uzunluğu: {jsonString.Length}", ex);
         }
+    }
 
-        using (doc)
+    private List<MarketData> ExtractMarketData(JsonElement root)
+    {
+        var fetchedData = new List<MarketData>();
+
+        foreach (var property in root.EnumerateObject())
         {
-            var root = doc.RootElement;
-            var fetchedData = new List<MarketData>();
-            var today = DateTime.Today;
+            if (property.Name == "Update_Date" || property.Name == "guncellenme_zamani")
+                continue;
 
-            foreach (var property in root.EnumerateObject())
+            try
             {
-                if (property.Name == "Update_Date" || property.Name == "guncellenme_zamani")
-                    continue;
-
-                try
+                var marketItem = ProcessMarketDataItem(property);
+                if (marketItem != null)
                 {
-                    var element = property.Value;
-
-                    // ToString() ile her türlü veriyi (sayı, metin vs.) string'e güvenle çeviriyoruz
-                    string sellingStr = "0";
-                    if (element.TryGetProperty("Selling", out var sellProp))
-                        sellingStr = sellProp.ToString();
-                    else if (element.TryGetProperty("Satış", out var satisProp))
-                        sellingStr = satisProp.ToString();
-
-                    string changeStr = "0";
-                    if (element.TryGetProperty("Change", out var changeProp))
-                        changeStr = changeProp.ToString();
-                    else if (element.TryGetProperty("Değişim", out var degisimProp))
-                        changeStr = degisimProp.ToString();
-
-                    changeStr = changeStr.Replace("%", "").Trim();
-
-                    decimal lastPrice = ParseToDecimal(sellingStr);
-                    decimal changePercentage = ParseToDecimal(changeStr);
-
-                    if (lastPrice > 0)
-                    {
-                        fetchedData.Add(new MarketData
-                        {
-                            SiteType = "altinzamani",
-                            Name = property.Name,
-                            LastPrice = lastPrice,
-                            ChangePercentage = changePercentage,
-                            ChangeAmount = 0,
-                            VolumeAmount = null,
-                            VolumeCount = null,
-                            RecordDate = DateTime.Now
-                        });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    logger.LogWarning($"Dönüştürülemedi: {property.Name} - {ex.Message}");
+                    fetchedData.Add(marketItem);
                 }
             }
-
-            if (!fetchedData.Any())
+            catch (Exception ex)
             {
-                throw new Exception("JSON başarıyla okundu ancak listeye eklenecek geçerli hiçbir fiyat bulunamadı!");
+                logger.LogWarning(ex, "Dönüştürülemedi: {PropertyName} - {ErrorMessage}", property.Name, ex.Message);
             }
-
-            var todaysExistingData = await context.MarketDatas
-                .Where(m => m.RecordDate.Date == today && m.SiteType == "altinzamani")
-                .ToListAsync();
-
-            await context.MarketDatas.AddRangeAsync(fetchedData);
-            await context.SaveChangesAsync();
         }
+
+        return fetchedData;
+    }
+
+    private static MarketData? ProcessMarketDataItem(JsonProperty property)
+    {
+        var element = property.Value;
+
+        string sellingStr = ExtractValue(element, "Selling", "Satış");
+        string changeStr = ExtractValue(element, "Change", "Değişim");
+
+        changeStr = changeStr.Replace("%", "").Trim();
+
+        decimal lastPrice = ParseToDecimal(sellingStr);
+        decimal changePercentage = ParseToDecimal(changeStr);
+
+        if (lastPrice > 0)
+        {
+            return new MarketData
+            {
+                SiteType = "altinzamani",
+                Name = property.Name,
+                LastPrice = lastPrice,
+                ChangePercentage = changePercentage,
+                ChangeAmount = 0,
+                VolumeAmount = null,
+                VolumeCount = null,
+                RecordDate = DateTime.Now
+            };
+        }
+
+        return null;
+    }
+
+    private static string ExtractValue(JsonElement element, string propName1, string propName2)
+    {
+        if (element.TryGetProperty(propName1, out var prop1) && prop1.ValueKind != JsonValueKind.Null)
+            return prop1.ToString();
+
+        if (element.TryGetProperty(propName2, out var prop2) && prop2.ValueKind != JsonValueKind.Null)
+            return prop2.ToString();
+
+        return "0";
     }
 
     public async Task CleanUpOldDataAsync()
     {
         var setting = await context.SiteSettings.FirstOrDefaultAsync();
-        int retentionDays = setting?.DataRetentionDays ?? 5;
+        int retentionDays = setting?.DataRetentionDays ?? 5; 
 
         var thresholdDate = DateTime.Today.AddDays(-retentionDays);
 
@@ -121,29 +143,27 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
             .Where(m => m.RecordDate.Date < thresholdDate)
             .ToListAsync();
 
-        if (oldRecords.Any())
+        if (oldRecords.Count != 0)
         {
             context.MarketDatas.RemoveRange(oldRecords);
             await context.SaveChangesAsync();
         }
     }
 
-    // Her türlü formattaki (1.500,55 veya 1500.55 vb.) sayıyı güvenle Decimal'e çevirir
-    private decimal ParseToDecimal(string value)
+    private static decimal ParseToDecimal(string? value)
     {
         if (string.IsNullOrWhiteSpace(value) || value == "0") return 0;
 
-        // Boşlukları ve para birimi sembollerini temizle
         value = value.Replace(" ", "").Replace("₺", "").Replace("$", "").Replace("€", "");
 
-        if (value.Contains(",") && value.Contains("."))
+        if (value.Contains(',') && value.Contains('.'))
         {
             value = value.Replace(".", "");
-            value = value.Replace(",", ".");
+            value = value.Replace(',', '.');
         }
-        else if (value.Contains(","))
+        else if (value.Contains(','))
         {
-            value = value.Replace(",", ".");
+            value = value.Replace(',', '.');
         }
 
         if (decimal.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal result))
