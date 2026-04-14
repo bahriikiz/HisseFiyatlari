@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace AltinZamani.Controllers
@@ -14,7 +15,8 @@ namespace AltinZamani.Controllers
     public class AdminController(
         ApplicationDbContext context,
         IRecurringJobManager recurringJobManager,
-        MarketDataService marketDataService) : Controller
+        MarketDataService marketDataService,
+        IWebHostEnvironment env) : Controller
     {
         private const string SuccessMessageKey = "SuccessMessage";
         private const string ErrorMessageKey = "ErrorMessage";
@@ -148,6 +150,7 @@ namespace AltinZamani.Controllers
                 // 4. İLETİŞİM VE SOSYAL MEDYA 
                 setting.ContactEmail = model.ContactEmail;
                 setting.FooterText = model.FooterText;
+                setting.ContactPhone = model.ContactPhone;
 
                 setting.InstagramUrl = model.InstagramUrl;
                 setting.IsInstagramActive = model.IsInstagramActive;
@@ -277,17 +280,30 @@ namespace AltinZamani.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateSponsor(Sponsor model)
+        public async Task<IActionResult> CreateSponsor(Sponsor model)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return View(model);
+
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
             {
-                return View(model);
+                string uploadsFolder = Path.Combine(env.WebRootPath, "uploads", "sponsors");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ImageFile.CopyToAsync(fileStream);
+                }
+
+                model.LogoUrl = "/uploads/sponsors/" + uniqueFileName;
             }
 
             context.Sponsors.Add(model);
             context.SaveChanges();
-            TempData[SuccessMessageKey] = "Sponsor başarıyla eklendi.";
-            return RedirectToAction(SponsorListAction);
+            TempData["SuccessMessage"] = "Sponsor başarıyla eklendi.";
+            return RedirectToAction("SponsorList");
         }
 
         [HttpGet]
@@ -305,17 +321,30 @@ namespace AltinZamani.Controllers
         }
 
         [HttpPost]
-        public IActionResult EditSponsor(Sponsor model)
+        public async Task<IActionResult> EditSponsor(Sponsor model)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return View(model);
+
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
             {
-                return View(model);
+                string uploadsFolder = Path.Combine(env.WebRootPath, "uploads", "sponsors");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ImageFile.CopyToAsync(fileStream);
+                }
+
+                model.LogoUrl = "/uploads/sponsors/" + uniqueFileName;
             }
 
             context.Sponsors.Update(model);
             context.SaveChanges();
-            TempData[SuccessMessageKey] = "Sponsor güncellendi.";
-            return RedirectToAction(SponsorListAction);
+            TempData["SuccessMessage"] = "Sponsor güncellendi.";
+            return RedirectToAction("SponsorList");
         }
 
         [HttpPost]
@@ -333,6 +362,96 @@ namespace AltinZamani.Controllers
                 context.SaveChanges();
             }
             return RedirectToAction(SponsorListAction);
+        }
+
+        // ==========================================
+        //         PARTNER / BACKLİNK SİTE YÖNETİMİ
+        // ==========================================
+
+        public IActionResult PartnerList()
+        {
+            var partners = context.Partners.OrderBy(p => p.Order).ToList();
+            return View(partners);
+        }
+
+        [HttpGet]
+        public IActionResult CreatePartner()
+        {
+            return View(new Partner { IsActive = true, BadgeColor = "primary" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreatePartner(Partner model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(env.WebRootPath, "uploads", "partners");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ImageFile.CopyToAsync(fileStream);
+                }
+
+                model.IconOrImageUrl = "/uploads/partners/" + uniqueFileName;
+            }
+
+            context.Partners.Add(model);
+            context.SaveChanges();
+            TempData[SuccessMessageKey] = "Partner başarıyla eklendi.";
+            return RedirectToAction("PartnerList");
+        }
+
+        [HttpGet]
+        public IActionResult EditPartner(int id)
+        {
+            var partner = context.Partners.Find(id);
+            if (partner == null) return NotFound();
+            return View(partner);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditPartner(Partner model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(env.WebRootPath, "uploads", "partners");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ImageFile.CopyToAsync(fileStream);
+                }
+
+                model.IconOrImageUrl = "/uploads/partners/" + uniqueFileName;
+            }
+
+            context.Partners.Update(model);
+            context.SaveChanges();
+            TempData[SuccessMessageKey] = "Partner güncellendi.";
+            return RedirectToAction("PartnerList");
+        }
+
+        [HttpPost]
+        public IActionResult DeletePartner(int id)
+        {
+            var partner = context.Partners.Find(id);
+            if (partner != null)
+            {
+                context.Partners.Remove(partner);
+                context.SaveChanges();
+            }
+            return RedirectToAction("PartnerList");
         }
     }
 }

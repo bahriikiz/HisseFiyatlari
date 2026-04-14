@@ -1,0 +1,62 @@
+﻿@model AltinZamani.Models.Menu
+@{
+    ViewData["Title"] = "Yeni Menü Ekle";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header bg-success text-white py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i> Yeni Menü Ekle</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="CreateMenu" method="post">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Title" class="form-label fw-bold">Menü Başlığı</label>
+                                <input asp-for="Title" class="form-control" placeholder="Örn: Krediler" required />
+                                <span asp-validation-for="Title" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Slug" class="form-label fw-bold">URL Uzantısı (Slug)</label>
+                                <input asp-for="Slug" class="form-control" placeholder="Örn: krediler" required />
+                                <small class="text-muted">Boşluksuz ve Türkçe karakter kullanmadan yazın.</small>
+                                <span asp-validation-for="Slug" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="Order" class="form-label fw-bold">Sıralama</label>
+                                <input asp-for="Order" type="number" class="form-control" value="1" />
+                            </div>
+                            <div class="col-md-6 mb-4 d-flex align-items-end pb-2">
+                                <div class="form-check form-switch">
+                                    <input asp-for="IsActive" class="form-check-input fs-5" type="checkbox" id="isActiveSwitch" checked>
+                                    <label class="form-check-label ms-2 pt-1 fw-bold text-success" for="isActiveSwitch">Menüde Görünsün (Aktif)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="MenuList" class="btn btn-outline-secondary fw-bold">
+                                <i class="bi bi-arrow-left me-1"></i> Geri Dön
+                            </a>
+                            <button type="submit" class="btn btn-success fw-bold px-4">
+                                <i class="bi bi-save me-1"></i> Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -12,6 +12,7 @@ namespace AltinZamani.Models
         public string? ContactEmail { get; set; }
         public string? FooterText { get; set; }
         public string? FacebookUrl { get; set; }
+        public string? ContactPhone { get; set; }
         public bool IsFacebookActive { get; set; }
         public string? TwitterUrl { get; set; }
         public bool IsTwitterActive { get; set; }

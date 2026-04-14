@@ -126,11 +126,15 @@
                     </div>
                     <div class="card-body p-4">
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label asp-for="ContactEmail" class="form-label fw-bold">İletişim E-posta</label>
                                 <input asp-for="ContactEmail" class="form-control" type="email" />
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="ContactPhone" class="form-label fw-bold">İletişim Telefonu</label>
+                                <input asp-for="ContactPhone" class="form-control" placeholder="05XX XXX XX XX" />
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label asp-for="FooterText" class="form-label fw-bold">Footer Yazısı</label>
                                 <input asp-for="FooterText" class="form-control" />
                             </div>

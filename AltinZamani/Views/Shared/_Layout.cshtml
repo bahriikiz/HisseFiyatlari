@@ -58,6 +58,55 @@
             font-size: 1.5rem;
             letter-spacing: -1px;
         }
+
+        /* YENİ: Yatay Kaydırılabilir Partner Alanı */
+        .partner-scroller {
+            display: flex;
+            overflow-x: auto;
+            gap: 1.5rem;
+            padding-bottom: 1rem;
+            padding-top: 0.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: #adb5bd #f8f9fa;
+        }
+
+            .partner-scroller::-webkit-scrollbar {
+                height: 8px;
+            }
+
+            .partner-scroller::-webkit-scrollbar-thumb {
+                background-color: #adb5bd;
+                border-radius: 10px;
+            }
+
+            .partner-scroller::-webkit-scrollbar-track {
+                background-color: #f8f9fa;
+                border-radius: 10px;
+            }
+
+        .partner-card {
+            min-width: 200px;
+            max-width: 200px;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none !important;
+            color: #0d3b66;
+        }
+
+            .partner-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+                border-color: #ffc107;
+                color: #0d3b66;
+            }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
@@ -109,19 +158,55 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-muted" asp-controller="Admin" asp-action="Settings">YÖNETİM</a>
-                        </li>
-
                         @if (User.Identity is { IsAuthenticated: true })
                         {
-                            <li class="nav-item ms-lg-2">
-                                <a class="nav-link text-danger fw-bold" asp-controller="Admin" asp-action="Logout" title="Çıkış Yap">
-                                    <i class="bi bi-power"></i> ÇIKIŞ
+                            <li class="nav-item dropdown ms-lg-2">
+                                <a class="nav-link dropdown-toggle fw-bold text-primary border border-primary rounded px-3" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-badge-fill me-1"></i> PANEL
                                 </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2" aria-labelledby="adminDropdown" style="border-radius: 12px; min-width: 200px;">
+                                    <li>
+                                        <h6 class="dropdown-header text-uppercase small fw-bold text-muted">Sistem Yönetimi</h6>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item rounded-3 py-2" asp-controller="Admin" asp-action="Settings">
+                                            <i class="bi bi-gear-fill me-2 text-secondary"></i> Sistem Ayarları
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <h6 class="dropdown-header text-uppercase small fw-bold text-muted">İçerik Yönetimi</h6>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item rounded-3 py-2" asp-controller="Admin" asp-action="MenuList">
+                                            <i class="bi bi-list-ul me-2 text-success"></i> Menü Yönetimi
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item rounded-3 py-2" asp-controller="Admin" asp-action="SponsorList">
+                                            <i class="bi bi-megaphone-fill me-2 text-warning"></i> Sponsor Yönetimi
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item rounded-3 py-2" asp-controller="Admin" asp-action="PartnerList">
+                                            <i class="bi bi-link-45deg me-2 text-primary"></i> Partner Yönetimi
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item rounded-3 py-2 text-danger fw-bold" asp-controller="Admin" asp-action="Logout">
+                                            <i class="bi bi-power me-2"></i> Güvenli Çıkış
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         }
-
+                        else
+                        {
+                            <li class="nav-item ms-lg-2">
+                                <a class="nav-link text-muted small" asp-controller="Admin" asp-action="Login">YÖNETİM</a>
+                            </li>
+                        }
                         <li class="nav-item ms-lg-3">
                             <a class="nav-link" href="#" style="font-size: 1.1rem;" aria-label="Sitede Ara"><i class="bi bi-search"></i></a>
                         </li>
@@ -195,6 +280,59 @@
         </div>
     </div>
 
+    @if (!isAdminPage)
+    {
+        <div class="container-fluid px-lg-5 mb-5 mt-3">
+            <div class="bg-white p-4 rounded-4 shadow-sm border">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                    <h5 class="fw-bold mb-0" style="color: #0d3b66;">
+                        <i class="bi bi-link-45deg text-primary me-2"></i> BackLink Verdiğimiz Siteler
+                    </h5>
+                </div>
+
+                <div class="partner-scroller">
+                    @{
+                        var activePartners = _context.Partners.Where(p => p.IsActive).OrderBy(p => p.Order).ToList();
+                    }
+
+                    @if (activePartners.Any())
+                    {
+                        @foreach (var partner in activePartners)
+                        {
+                            <a href="@partner.Url" target="_blank" class="partner-card bg-light">
+
+                                @if (!string.IsNullOrEmpty(partner.IconOrImageUrl) && partner.IconOrImageUrl.StartsWith("bi-"))
+                                {
+                                    <i class="bi @partner.IconOrImageUrl mb-3" style="font-size: 2.5rem; color: #0d3b66;"></i>
+                                }
+                                else if (!string.IsNullOrEmpty(partner.IconOrImageUrl))
+                                {
+                                    <img src="@partner.IconOrImageUrl" alt="@partner.Name" class="img-fluid mb-3" style="max-height: 50px;">
+                                }
+
+                                <h6 class="fw-bold mb-0">@partner.Name</h6>
+
+                                @if (!string.IsNullOrEmpty(partner.BadgeText))
+                                {
+                                    <span class="badge bg-@(string.IsNullOrEmpty(partner.BadgeColor) ? "primary" : partner.BadgeColor) mt-2">
+                                        @partner.BadgeText
+                                    </span>
+                                }
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <div class="partner-card border-dashed text-muted" style="border-style: dashed; border-color: #adb5bd; background: transparent;">
+                            <i class="bi bi-plus-circle mb-2" style="font-size: 2.5rem;"></i>
+                            <h6 class="partner-title">Sponsor Olun</h6>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
     <footer class="border-top footer text-muted bg-white mt-auto py-4">
         @if (!isAdminPage && !string.IsNullOrEmpty(settings.BannerAdCode))
         {
@@ -234,6 +372,14 @@
                         <div class="small text-muted">
                             <i class="bi bi-envelope-at me-1"></i>
                             <a href="mailto:@settings.ContactEmail" class="text-decoration-none text-muted">@settings.ContactEmail</a>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(settings.ContactPhone))
+                    {
+                        <div class="small text-muted mt-1">
+                            <i class="bi bi-telephone me-1"></i>
+                            <a href="tel:@settings.ContactPhone" class="text-decoration-none text-muted">@settings.ContactPhone</a>
                         </div>
                     }
                 </div>
