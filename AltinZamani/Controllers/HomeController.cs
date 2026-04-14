@@ -78,6 +78,13 @@ namespace AltinZamani.Controllers
             return View(page); // Bulunan sayfayı View'a gönder
         }
 
+        // Hakkımızda sayfası (Eğer veritabanında "hakkimizda" slug'lı bir sayfa yoksa bu metot çalışır)
+        [HttpGet]
+        public IActionResult About()
+        {
+            return View();
+        }
+
         // --- GRAFİK İÇİN EKLENEN METOT ---
         [HttpGet]
         public IActionResult GetChartData(string name = "gram-altin")
@@ -179,6 +186,49 @@ namespace AltinZamani.Controllers
                 ViewBag.ErrorMessage = $"Mesaj gönderilirken sunucu kaynaklı bir hata oluştu: {ex.Message}";
                 return View(model);
             }
+        }
+
+        // --- DİNAMİK SİTEMAP.XML (SEO İÇİN) ---
+        [Route("sitemap.xml")]
+        public IActionResult Sitemap()
+        {
+            // Sitenin o anki kök adresini (https://www.altinzamani.com gibi) otomatik alır
+            string baseUrl = $"{Request.Scheme}://{Request.Host}";
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            sb.AppendLine("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
+
+            // 1. Ana Sayfa (Sürekli güncellendiği için priority: 1.0)
+            sb.AppendLine("  <url>");
+            sb.AppendLine($"    <loc>{baseUrl}/</loc>");
+            sb.AppendLine($"    <lastmod>{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ssZ}</lastmod>");
+            sb.AppendLine("    <changefreq>hourly</changefreq>");
+            sb.AppendLine("    <priority>1.0</priority>");
+            sb.AppendLine("  </url>");
+
+            // 2. İletişim Sayfası
+            sb.AppendLine("  <url>");
+            sb.AppendLine($"    <loc>{baseUrl}/Home/Contact</loc>");
+            sb.AppendLine("    <changefreq>monthly</changefreq>");
+            sb.AppendLine("    <priority>0.8</priority>");
+            sb.AppendLine("  </url>");
+
+            // 3. Veritabanındaki Dinamik Menüler (Hakkımızda, Gizlilik vs.)
+            var activeMenus = context.Menus.Where(m => m.IsActive).ToList();
+            foreach (var menu in activeMenus)
+            {
+                sb.AppendLine("  <url>");
+                sb.AppendLine($"    <loc>{baseUrl}/Home/Page?slug={menu.Slug}</loc>");
+                sb.AppendLine("    <changefreq>weekly</changefreq>");
+                sb.AppendLine("    <priority>0.8</priority>");
+                sb.AppendLine("  </url>");
+            }
+
+            sb.AppendLine("</urlset>");
+
+            // Tarayıcıya bu metnin bir "XML" dosyası olduğunu söyleyerek gönderiyoruz
+            return Content(sb.ToString(), "application/xml", System.Text.Encoding.UTF8);
         }
     }
 }
