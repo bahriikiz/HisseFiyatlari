@@ -75,6 +75,7 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Menüyü aç">
                     <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end kurumsal-menu">
@@ -96,6 +97,21 @@
                                 </a>
                             </li>
                         }
+
+                        @foreach (var menu in dynamicMenus)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Page" asp-route-slug="@menu.Slug">
+                                    @menu.Title
+                                </a>
+                            </li>
+                        }
+
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold" asp-area="" asp-controller="Home" asp-action="Contact" style="color: #0d6efd !important;">
+                                <i class="bi bi-envelope-at me-1"></i>@(isEn ? "CONTACT" : "İLETİŞİM")
+                            </a>
+                        </li>
 
                         <li class="nav-item">
                             <a class="nav-link text-muted" asp-controller="Admin" asp-action="Settings">YÖNETİM</a>

@@ -1,0 +1,75 @@
+﻿@model AltinZamani.Models.ContactViewModel
+@{
+    ViewData["Title"] = "İletişim";
+    string lang = Context.Request.Cookies["SiteLanguage"] ?? "tr";
+    bool isEn = lang == "en";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-dark text-white text-center py-4">
+                    <h2 class="mb-0"><i class="bi bi-envelope-paper me-2"></i>@(isEn ? "Contact Us" : "Bize Ulaşın")</h2>
+                    <p class="mb-0 mt-2 text-white-50">@(isEn ? "We'd love to hear from you." : "Soru, görüş ve önerileriniz için formu doldurabilirsiniz.")</p>
+                </div>
+
+                <div class="card-body p-5">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> @ViewBag.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Contact" asp-controller="Home" method="post">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Name" class="form-label fw-bold">@(isEn ? "Full Name" : "Ad Soyad")</label>
+                                <input asp-for="Name" class="form-control form-control-lg" placeholder="@(isEn ? "John Doe" : "Örn: Ahmet Yılmaz")" />
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mt-3 mt-md-0">
+                                <label asp-for="Email" class="form-label fw-bold">@(isEn ? "Email Address" : "E-Posta Adresi")</label>
+                                <input asp-for="Email" type="email" class="form-control form-control-lg" placeholder="ornek@mail.com" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Subject" class="form-label fw-bold">@(isEn ? "Subject" : "Konu")</label>
+                            <input asp-for="Subject" class="form-control form-control-lg" placeholder="@(isEn ? "What is this regarding?" : "Mesajınızın konusu nedir?")" />
+                            <span asp-validation-for="Subject" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Message" class="form-label fw-bold">@(isEn ? "Message" : "Mesajınız")</label>
+                            <textarea asp-for="Message" class="form-control form-control-lg" rows="5" placeholder="@(isEn ? "Type your message here..." : "Detaylı mesajınızı buraya yazabilirsiniz...")"></textarea>
+                            <span asp-validation-for="Message" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold text-dark">
+                                <i class="bi bi-send-fill me-2"></i> @(isEn ? "Send Message" : "Mesajı Gönder")
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -120,5 +120,65 @@ namespace AltinZamani.Controllers
             // Kullanıcıyı geldiği sayfaya geri gönderiyoruz
             return LocalRedirect(returnUrl);
         }
+
+        // --- İLETİŞİM SAYFASI (GET) ---
+        [HttpGet]
+        public IActionResult Contact()
+        {
+            return View();
+        }
+
+        // --- İLETİŞİM FORMU MAİL GÖNDERME (POST) ---
+        [HttpPost]
+        public IActionResult Contact(Models.ContactViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                // 1. SMTP Ayarları (Kendi mail adresin ve Uygulama Şifren ile değiştir)
+                string smtpServer = "smtp.gmail.com";
+                int smtpPort = 587;
+                string smtpUser = "bilgi@ebiscube.com";
+                string smtpPass = "google_uygulama_sifren_buraya";
+
+                // 2. Kime gidecek? (Admin panelinden ayarladığın ContactEmail adresini alıyoruz)
+                var settings = context.SiteSettings.FirstOrDefault();
+                string toEmail = settings?.ContactEmail ?? "admin@altinzamani.com";
+
+                // 3. Maili Gönderme İşlemi
+                using (var client = new System.Net.Mail.SmtpClient(smtpServer, smtpPort))
+                {
+                    System.Net.NetworkCredential networkCredential = new(smtpUser, smtpPass);
+                    client.Credentials = networkCredential;
+                    client.EnableSsl = true;
+
+                    var mailMessage = new System.Net.Mail.MailMessage
+                    {
+                        From = new System.Net.Mail.MailAddress(smtpUser, "Altın Zamanı Web Formu"),
+                        Subject = $"Yeni İletişim Mesajı: {model.Subject}",
+                        Body = $"<strong>Gönderen Adı:</strong> {model.Name} <br/>" +
+                               $"<strong>E-Posta:</strong> {model.Email} <br/><br/>" +
+                               $"<strong>Mesaj:</strong> <br/> {model.Message}",
+                        IsBodyHtml = true
+                    };
+
+                    mailMessage.To.Add(toEmail);
+                    client.Send(mailMessage); // Maili fırlat!
+                }
+
+                TempData["SuccessMessage"] = "Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.";
+                return RedirectToAction("Contact");
+            }
+            catch (Exception ex)
+            {
+                // Mail gönderiminde hata olursa sayfada göster
+                ViewBag.ErrorMessage = $"Mesaj gönderilirken sunucu kaynaklı bir hata oluştu: {ex.Message}";
+                return View(model);
+            }
+        }
     }
 }
