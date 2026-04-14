@@ -1,0 +1,51 @@
+﻿@model List<AltinZamani.Models.Menu>
+@{
+    ViewData["Title"] = "Menü Yönetimi";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Menü ve Sayfa Yönetimi</h2>
+        <a asp-action="CreateMenu" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Yeni Sayfa Ekle</a>
+    </div>
+
+    <table class="table table-hover bg-white shadow-sm rounded">
+        <thead class="table-dark">
+            <tr>
+                <th>Sıra</th>
+                <th>Başlık</th>
+                <th>Slug (URL)</th>
+                <th>Durum</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Order</td>
+                    <td>@item.Title</td>
+                    <td><code>/@item.Slug</code></td>
+                    <td>
+                        @if (item.IsActive)
+                        {
+                            <span class="badge bg-success">Aktif</span>
+                        }
+                        else
+                        {
+
+                            <span class="badge bg-danger">Pasif</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="EditMenu" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Düzenle</a>
+                        <form asp-action="DeleteMenu" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Silmek istediğine emin misin?')">
+                            <button type="submit" class="btn btn-sm btn-danger">Sil</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

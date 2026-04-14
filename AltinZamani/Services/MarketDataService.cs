@@ -2,7 +2,6 @@
 using AltinZamani.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using Microsoft.Extensions.Configuration; 
 
 namespace AltinZamani.Services;
 
@@ -11,8 +10,8 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
     public async Task FetchAndSaveMarketDataAsync()
     {
         SetupHttpClient();
-
-        string apiUrl = configuration["MarketApi:Url"] ?? "https://finans.truncgil.com/today.json";
+        // API URL'sini yapılandırma dosyasından alıyoruz
+        string apiUrl = configuration["MarketApi:Url"] ?? throw new InvalidOperationException("API URL yapılandırma dosyasında (appsettings.json 'MarketApi:Url') bulunamadı!");
 
         var jsonString = await FetchJsonFromApiAsync(apiUrl);
 

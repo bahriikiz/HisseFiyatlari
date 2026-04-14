@@ -40,7 +40,7 @@
 
     <style>
         .kurumsal-menu .nav-link {
-            color: #0d3b66 !important; /* Lacivert tonu */
+            color: #0d3b66 !important;
             font-weight: 600;
             font-size: 0.9rem;
             letter-spacing: 0.5px;
@@ -49,7 +49,7 @@
         }
 
             .kurumsal-menu .nav-link:hover {
-                color: #ffc107 !important; /* Üzerine gelince altın sarısı */
+                color: #ffc107 !important;
             }
 
         .kurumsal-logo-yazi {
@@ -73,26 +73,35 @@
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                        aria-expanded="false" aria-label="Menüyü aç">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end kurumsal-menu">
                     <ul class="navbar-nav align-items-center">
+
+                        @{
+                            var dynamicMenus = _context.Menus.Where(m => m.IsActive).OrderBy(m => m.Order).ToList();
+                        }
+
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">@(isEn ? "MARKETS" : "PİYASALAR")</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">@(isEn ? "ANALYSIS" : "ANALİZ")</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">@(isEn ? "NEWS" : "HABERLER")</a>
-                        </li>
+
+                        @foreach (var menu in dynamicMenus)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Page" asp-route-slug="@menu.Slug">
+                                    @menu.Title
+                                </a>
+                            </li>
+                        }
+
                         <li class="nav-item">
                             <a class="nav-link text-muted" asp-controller="Admin" asp-action="Settings">YÖNETİM</a>
                         </li>
 
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User.Identity is { IsAuthenticated: true })
                         {
                             <li class="nav-item ms-lg-2">
                                 <a class="nav-link text-danger fw-bold" asp-controller="Admin" asp-action="Logout" title="Çıkış Yap">
@@ -126,14 +135,12 @@
         @if (!isAdminPage && !string.IsNullOrEmpty(settings.TopAdCode))
         {
             <div class="row mb-3 text-center">
-                <div class="col-12">
-                    @Html.Raw(settings.TopAdCode)
-                </div>
+                <div class="col-12">@Html.Raw(settings.TopAdCode)</div>
             </div>
         }
 
         <div class="row">
-            <aside class="col-xl-2 d-none d-xl-block text-center">
+            <aside class="col-xl-2 d-none d-xl-block text-center" aria-label="Sol Reklam Alanı">
                 <div class="sticky-top" style="top: 100px;">
                     @if (!isAdminPage && !string.IsNullOrEmpty(settings.LeftAdCode))
                     {
@@ -146,11 +153,30 @@
                 @RenderBody()
             </main>
 
-            <aside class="col-xl-2 d-none d-xl-block text-center">
+            <aside class="col-xl-2 d-none d-xl-block text-center" aria-labelledby="sponsor-heading">
                 <div class="sticky-top" style="top: 100px;">
+                    <h6 id="sponsor-heading" class="text-muted border-bottom pb-2 mb-3">SPONSORLARIMIZ</h6>
+
+                    @{
+                        var activeSponsors = _context.Sponsors.Where(s => s.IsActive == true).OrderBy(s => s.Order).ToList();
+                    }
+
+                    @foreach (var sponsor in activeSponsors)
+                    {
+                        <div class="card mb-3 border-0 shadow-sm text-center p-2">
+                            <a href="@sponsor.WebsiteLink" target="_blank" title="@sponsor.Name" class="text-decoration-none">
+                                @if (!string.IsNullOrEmpty(sponsor.LogoUrl))
+                                {
+                                    <img src="@sponsor.LogoUrl" class="img-fluid mb-2 rounded" alt="@sponsor.Name" style="max-height: 80px;">
+                                }
+                                <div class="small fw-bold text-dark">@sponsor.Name</div>
+                            </a>
+                        </div>
+                    }
+
                     @if (!isAdminPage && !string.IsNullOrEmpty(settings.RightAdCode))
                     {
-                        @Html.Raw(settings.RightAdCode)
+                        <div class="mt-4">@Html.Raw(settings.RightAdCode)</div>
                     }
                 </div>
             </aside>
@@ -158,6 +184,13 @@
     </div>
 
     <footer class="border-top footer text-muted bg-white mt-auto py-4">
+        @if (!isAdminPage && !string.IsNullOrEmpty(settings.BannerAdCode))
+        {
+            <div class="container-fluid text-center mb-4">
+                @Html.Raw(settings.BannerAdCode)
+            </div>
+        }
+
         <div class="container-fluid px-lg-5">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start">
@@ -169,24 +202,23 @@
                 </div>
                 <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
                     <div class="social-links mb-2">
-                        @if (!string.IsNullOrEmpty(settings.InstagramUrl))
+                        @if (!string.IsNullOrEmpty(settings.InstagramUrl) && settings.IsInstagramActive)
                         {
                             <a href="@settings.InstagramUrl" target="_blank" class="text-danger fs-4 me-3"><i class="bi bi-instagram"></i></a>
                         }
-                        @if (!string.IsNullOrEmpty(settings.TwitterUrl))
+                        @if (!string.IsNullOrEmpty(settings.TwitterUrl) && settings.IsTwitterActive)
                         {
                             <a href="@settings.TwitterUrl" target="_blank" class="text-dark fs-4 me-3"><i class="bi bi-twitter-x"></i></a>
                         }
-                        @if (!string.IsNullOrEmpty(settings.FacebookUrl))
+                        @if (!string.IsNullOrEmpty(settings.FacebookUrl) && settings.IsFacebookActive)
                         {
                             <a href="@settings.FacebookUrl" target="_blank" style="color:#0d6efd;" class="fs-4"><i class="bi bi-facebook"></i></a>
                         }
                     </div>
                     @if (!string.IsNullOrEmpty(settings.ContactEmail))
                     {
-                        <div class="small">
-                            <i class="bi bi-envelope-at text-muted"></i>
-                            <a href="mailto:@settings.ContactEmail" class="text-decoration-none text-muted">@settings.ContactEmail</a>
+                        <div class="small text-muted">
+                            <i class="bi bi-envelope-at me-1"></i>@settings.ContactEmail
                         </div>
                     }
                 </div>

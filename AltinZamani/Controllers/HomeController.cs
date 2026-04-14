@@ -1,81 +1,91 @@
 ﻿using AltinZamani.Data;
 using AltinZamani.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace AltinZamani.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(ApplicationDbContext context) : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly ApplicationDbContext _context;
-
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
-        {
-            _logger = logger;
-            _context = context;
-        }
-
         public IActionResult Index(string currency = "TRY")
         {
-            // Son 24 saat içindeki en güncel verileri alıyoruz (Today yerine 24 saat daha güvenlidir)
-            var son24Saat = DateTime.Now.AddHours(-24);
+            // Son 5 takvim gününü (Bugün dahil) garantiye almak için bir liste oluşturuyoruz
+            var son5GunListesi = Enumerable.Range(0, 5)
+                                           .Select(i => DateTime.Now.Date.AddDays(-i))
+                                           .ToList();
 
-            var marketData = _context.MarketDatas
-                .Where(m => m.SiteType == "altinzamani" && m.RecordDate >= son24Saat)
-                .AsEnumerable() // Gruplama işlemini bellek üzerinde yaparak performans ve uyumluluk sağlıyoruz
-                .GroupBy(m => m.Name)
-                .Select(g => g.OrderByDescending(m => m.RecordDate).First())
+            var baslangicTarihi = son5GunListesi.Last();
+
+            // Veritabanından verileri çekiyoruz
+            var rawData = context.MarketDatas
+                .Where(m => m.SiteType == "altinzamani" && m.RecordDate >= baslangicTarihi)
                 .ToList();
 
-            decimal bolenDeger = 1;
-            string sembol = "TL"; // ₺ sembolü yerine soru işareti hatasını önlemek için TL yazdık
+            // Dictionary'i her zaman 5 gün olacak şekilde başlatıyoruz
+            var groupedData = new Dictionary<DateTime, List<MarketData>>();
 
+            foreach (var gun in son5GunListesi)
+            {
+                var oGununVerileri = rawData
+                    .Where(m => m.RecordDate.Date == gun)
+                    .GroupBy(m => m.Name)
+                    .Select(g => g.OrderByDescending(x => x.RecordDate).First())
+                    .OrderByDescending(x => x.LastPrice)
+                    .ToList();
+
+                groupedData.Add(gun, oGununVerileri);
+            }
+
+            // Döviz hesaplama kısımları (Aynı kalıyor)
+            decimal bolenDeger = 1;
+            string sembol = "₺";
             if (currency != "TRY")
             {
-                var secilenDoviz = marketData.FirstOrDefault(m => m.Name.Equals(currency, StringComparison.OrdinalIgnoreCase));
-
+                var bugunData = groupedData[DateTime.Now.Date];
+                var secilenDoviz = bugunData?.FirstOrDefault(m => string.Equals(m.Name, currency, StringComparison.OrdinalIgnoreCase));
                 if (secilenDoviz != null && secilenDoviz.LastPrice > 0)
                 {
                     bolenDeger = secilenDoviz.LastPrice;
-                    sembol = currency switch
-                    {
-                        "USD" => "$",
-                        "EUR" => "€",
-                        "GBP" => "£",
-                        _ => currency
-                    };
-                }
-                else
-                {
-                    currency = "TRY";
+                    sembol = currency switch { "USD" => "$", "EUR" => "€", "GBP" => "£", _ => currency };
                 }
             }
 
-            // Fiyat dönüştürme işlemi
             if (bolenDeger != 1)
             {
-                foreach (var item in marketData)
+                foreach (var dayList in groupedData.Values)
                 {
-                    item.LastPrice = item.LastPrice / bolenDeger;
+                    foreach (var item in dayList) { item.LastPrice /= bolenDeger; }
                 }
             }
 
             ViewBag.SelectedCurrency = currency;
             ViewBag.CurrencySymbol = sembol;
 
-            return View(marketData);
+            return View(groupedData);
         }
 
-        // --- GRAFİK İÇİN YENİ EKLENEN METOT ---
+        // Dinamik sayfa gösterimi için slug (url) ile sayfa bulma
+        public IActionResult Page(string slug)
+        {
+            // Veritabanından gelen slug (url) ile eşleşen ve aktif olan menüyü/sayfayı buluyoruz
+            var page = context.Menus.FirstOrDefault(m => m.Slug == slug && m.IsActive);
+
+            if (page == null)
+            {
+                return RedirectToAction("Index"); // Sayfa yoksa anasayfaya at
+            }
+
+            return View(page); // Bulunan sayfayı View'a gönder
+        }
+
+        // --- GRAFİK İÇİN EKLENEN METOT ---
         [HttpGet]
         public IActionResult GetChartData(string name = "gram-altin")
         {
             // Son 24 saatlik fiyat geçmişini getirir
             var limit = DateTime.Now.AddHours(-24);
 
-            var history = _context.MarketDatas
+            var history = context.MarketDatas
                 .Where(m => m.Name == name && m.RecordDate >= limit)
                 .OrderBy(m => m.RecordDate)
                 .Select(m => new {
@@ -97,8 +107,8 @@ namespace AltinZamani.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-    
-    [HttpGet]
+
+        [HttpGet]
         public IActionResult SetLanguage(string culture, string returnUrl = "/")
         {
             // Kullanıcının seçtiği dili tarayıcıya 1 yıllığına kaydediyoruz

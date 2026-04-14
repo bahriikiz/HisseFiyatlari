@@ -5,12 +5,23 @@ namespace AltinZamani.Models
     public class Sponsor
     {
         [Key]
-        public int Id { get; set; }
-        public string? SiteType { get; set; }
-        public string? Name { get; set; } // Sponsor adı [cite: 41]
-        public string? LogoUrl { get; set; } // Sponsor logo [cite: 40]
-        public string? TargetUrl { get; set; } // Web sitesi linki [cite: 42]
-        public int Order { get; set; }
-        public bool IsActive { get; set; }
+        public int? Id { get; set; }
+
+        [Display(Name = "Sponsor Adı")]
+        public string? Name { get; set; }
+
+        [Display(Name = "Sponsor Logo URL")]
+        public string? LogoUrl { get; set; }
+
+        [Display(Name = "Web Sitesi Linki")]
+        public string? WebsiteLink { get; set; }
+
+        [Required]
+        [Display(Name = "Sıra Numarası")]
+        public int? Order { get; set; }
+
+        [Required] 
+        [Display(Name = "Aktif mi?")]
+        public bool? IsActive { get; set; }
     }
 }

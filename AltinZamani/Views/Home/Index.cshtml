@@ -1,25 +1,37 @@
-﻿@model List<AltinZamani.Models.MarketData>
+﻿@model Dictionary<DateTime, List<AltinZamani.Models.MarketData>>
 
 @{
     ViewData["Title"] = "Ana Sayfa - Canlı Piyasalar";
+    var today = DateTime.Now.Date;
 
-    var kurlar = Model.Where(m => m.Name == "USD" || m.Name == "EUR" || m.Name == "GBP").ToList();
-    var temelAltinlar = Model.Where(m => m.Name == "gram-altin" || m.Name == "ceyrek-altin" || m.Name == "ons").ToList();
-    var digerAltinlar = Model.Where(m => !kurlar.Contains(m) && !temelAltinlar.Contains(m)).OrderByDescending(m => m.LastPrice).ToList();
+    // Modelin boş olma ihtimaline karşı güvenlik ve EN GÜNCEL günün verilerini alma
+    var latestData = (Model != null && Model.Any()) ? Model.First().Value : new List<AltinZamani.Models.MarketData>();
+
+    // Özet kartlar için kurları ayırıyoruz
+    var kurlar = latestData.Where(m => m.Name == "USD" || m.Name == "EUR" || m.Name == "GBP").ToList();
+    var temelAltinlar = latestData.Where(m => m.Name == "gram-altin" || m.Name == "ceyrek-altin" || m.Name == "ons").ToList();
 
     string aktifSembol = ViewBag.SelectedCurrency == "TRY" ? "₺" : (ViewBag.CurrencySymbol ?? "₺");
     string aktifKur = ViewBag.SelectedCurrency ?? "TRY";
 
-    // Dili Okuyoruz
+    // Dil Ayarları
     string lang = Context.Request.Cookies["SiteLanguage"] ?? "tr";
     bool isEn = lang == "en";
 
-    // Altın isimlerini İngilizceye çeviren ufak bir fonksiyon
-    string TranslateName(string name)
+    // LİNTER ÇÖZÜMÜ: İç içe ternary yerine temiz metot
+    string GetTabLabel(DateTime date)
     {
+        if (date == today) return isEn ? "Today" : "Bugün";
+        if (date == today.AddDays(-1)) return isEn ? "Yesterday" : "Dün";
+        return date.ToString("dd.MM.yyyy");
+    }
+
+    string TranslateName(string? name)
+    {
+        if (string.IsNullOrEmpty(name)) return "";
         if (!isEn) return name.ToUpper().Replace("-", " ");
 
-        return name switch
+        return name.ToLower() switch
         {
             "gram-altin" => "GRAM GOLD",
             "ceyrek-altin" => "QUARTER GOLD",
@@ -32,24 +44,25 @@
         };
     }
 }
+
 <div class="text-center mb-4">
     <h1 class="display-4 fw-bold text-warning">@(isEn ? "Golden Time" : "Altın Zamanı")</h1>
     <p class="lead">@(isEn ? "The most up-to-date live gold and currency prices" : "En güncel canlı altın ve döviz fiyatları")</p>
 </div>
 
 <div class="d-flex justify-content-center mb-4">
-    <div class="btn-group shadow-sm" role="group" aria-label="Para Birimi Seçimi">
+    <fieldset class="btn-group shadow-sm" aria-label="Para Birimi Seçimi">
         <a href="/?currency=TRY" class="btn btn-outline-primary @(aktifKur == "TRY" ? "active" : "") fw-bold">TL (₺)</a>
         <a href="/?currency=USD" class="btn btn-outline-success @(aktifKur == "USD" ? "active" : "") fw-bold">USD ($)</a>
         <a href="/?currency=EUR" class="btn btn-outline-info @(aktifKur == "EUR" ? "active" : "") fw-bold">EUR (€)</a>
         <a href="/?currency=GBP" class="btn btn-outline-warning @(aktifKur == "GBP" ? "active" : "") fw-bold">GBP (£)</a>
-    </div>
+    </fieldset>
 </div>
 
-@if (!Model.Any())
+@if (Model == null || !Model.Any())
 {
     <div class="alert alert-warning text-center">
-        Şu anda piyasa verisi bulunamadı. Lütfen daha sonra tekrar deneyin.
+        @(isEn ? "No market data available at the moment. Please try again later." : "Şu anda piyasa verisi bulunamadı. Lütfen daha sonra tekrar deneyin.")
     </div>
 }
 else
@@ -73,7 +86,7 @@ else
         {
             string colorClass = item.ChangePercentage >= 0 ? "text-success" : "text-danger";
             string iconClass = item.ChangePercentage >= 0 ? "▲" : "▼";
-            string displayName = item.Name.ToUpper().Replace("-", " ");
+            string displayName = TranslateName(item.Name);
 
             <div class="col-md-4 col-sm-6 mb-3">
                 <div class="card shadow-sm border-0 h-100">
@@ -91,43 +104,100 @@ else
         }
     </div>
 
-    <div class="card shadow border-0">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">@(isEn ? "All Market Data" : "Tüm Piyasa Verileri")</h5>
-            <span class="badge bg-primary">Birim: @aktifKur</span>
+    <div class="card shadow border-0 mb-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0">
+                <i class="bi bi-bar-chart-fill me-2"></i>@(isEn ? "Market Analysis (5 Days)" : "Piyasa Analizi (Son 5 Gün)")
+            </h5>
+            <div>
+                <span class="badge bg-primary me-2">Birim: @aktifKur</span>
+                <button onclick="exportToExcel()" class="btn btn-sm btn-success fw-bold">
+                    <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                </button>
+            </div>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>@(isEn ? "Asset Name" : "Birim Adı")</th>
-                            <th class="text-end">@(isEn ? "Last Price" : "Son Fiyat") (@aktifSembol)</th>
-                            <th class="text-end">@(isEn ? "Daily Change" : "Günlük Değişim")</th>
-                            <th class="text-end">@(isEn ? "Last Update" : "Son Güncelleme")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in digerAltinlar)
-                        {
-                            string colorClass = item.ChangePercentage >= 0 ? "text-success" : "text-danger";
-                            string displayName = item.Name.ToUpper().Replace("-", " ");
 
-                            <tr>
-                                <td class="fw-bold">@displayName</td>
-                                <td class="text-end fw-bold">@item.LastPrice.ToString(aktifKur == "TRY" ? "N2" : "N4")</td>
-                                <td class="text-end @colorClass fw-bold">
-                                    %@item.ChangePercentage.ToString("N2")
-                                </td>
-                                <td class="text-end text-muted">@item.RecordDate.ToString("HH:mm:ss")</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+        <div class="card-header bg-white border-bottom-0 pt-3 pb-0 px-4">
+            <ul class="nav nav-tabs" id="marketTabs">
+                @{
+                    int tabIndex = 0;
+                }
+                @foreach (var dateKey in Model.Keys)
+                {
+                    string tabId = $"tab-{dateKey:yyyyMMdd}";
+                    string tabLabel = GetTabLabel(dateKey);
+                    string activeClass = tabIndex == 0 ? "active" : "";
+
+                    <li class="nav-item">
+                        <button class="nav-link @activeClass fw-bold px-4" id="@tabId-tab" data-bs-toggle="tab" data-bs-target="#@tabId" type="button" role="tab" aria-controls="@tabId" aria-selected="@(tabIndex == 0 ? "true" : "false")">
+                            @tabLabel
+                        </button>
+                    </li>
+                    tabIndex++;
+                }
+            </ul>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="tab-content" id="marketTabsContent">
+                @{
+                    tabIndex = 0;
+                }
+                @foreach (var kvp in Model)
+                {
+                    string tabId = $"tab-{kvp.Key:yyyyMMdd}";
+                    string activeClass = tabIndex == 0 ? "show active" : "";
+
+                    <div class="tab-pane fade @activeClass" id="@tabId" role="tabpanel" aria-labelledby="@tabId-tab">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0 align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-4 py-3">@(isEn ? "Asset Name" : "Birim Adı")</th>
+                                        <th class="py-3 text-end">@(isEn ? "Price" : "Fiyat") (@aktifSembol)</th>
+                                        <th class="py-3 text-end">@(isEn ? "Daily Change" : "Günlük Değişim")</th>
+                                        <th class="py-3 text-end pe-4">@(isEn ? "Time" : "Saat")</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in kvp.Value)
+                                    {
+                                        string colorClass = item.ChangePercentage >= 0 ? "text-success" : "text-danger";
+                                        string displayName = TranslateName(item.Name);
+
+                                        <tr>
+                                            <td class="ps-4 fw-bold text-dark">
+                                                <i class="bi bi-circle-fill text-warning me-2" style="font-size: 0.6rem;"></i>
+                                                @displayName
+                                            </td>
+                                            <td class="text-end fw-bold" style="color: #0d3b66;">
+                                                @item.LastPrice.ToString(aktifKur == "TRY" ? "N2" : "N4")
+                                            </td>
+                                            <td class="text-end @colorClass fw-bold">
+                                                %@item.ChangePercentage.ToString("N2")
+                                            </td>
+                                            <td class="text-end text-muted pe-4">
+                                                @item.RecordDate.ToString("HH:mm")
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (!kvp.Value.Any())
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4 text-muted">@(isEn ? "No data found for this date." : "Bu tarihe ait veri bulunamadı.")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    tabIndex++;
+                }
             </div>
         </div>
     </div>
 }
+
 @inject AltinZamani.Data.ApplicationDbContext _context
 @{
     var settings = _context.SiteSettings.FirstOrDefault();
@@ -144,11 +214,24 @@ else
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const ctx = document.getElementById('goldChart').getContext('2d');
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-            // Gram Altın verilerini çekip grafiğe basıyoruz
+    <script>
+        // Excel İndirme Fonksiyonu
+        function exportToExcel() {
+            const activeTabPane = document.querySelector('.tab-pane.active table');
+            const dateStr = document.querySelector('.nav-link.active').innerText.trim();
+            const wb = XLSX.utils.table_to_book(activeTabPane, { sheet: "Piyasa_Verileri" });
+            XLSX.writeFile(wb, `AltinZamani_${dateStr}.xlsx`);
+        }
+
+        // Grafik Fonksiyonu
+        document.addEventListener("DOMContentLoaded", function () {
+            const chartCanvas = document.getElementById('goldChart');
+            if(!chartCanvas) return;
+
+            const ctx = chartCanvas.getContext('2d');
+
             fetch('/Home/GetChartData?name=gram-altin')
                 .then(response => response.json())
                 .then(data => {
@@ -168,7 +251,7 @@ else
                                 backgroundColor: 'rgba(255, 193, 7, 0.1)',
                                 borderWidth: 3,
                                 fill: true,
-                                tension: 0.4, // Çizgiyi kavisli yapar
+                                tension: 0.4,
                                 pointRadius: 3,
                                 pointBackgroundColor: '#ffc107'
                             }]

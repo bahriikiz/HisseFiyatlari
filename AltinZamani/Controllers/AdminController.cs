@@ -10,31 +10,60 @@ using System.Security.Claims;
 
 namespace AltinZamani.Controllers
 {
-    // AdminController, site yöneticisinin giriş yapabileceği, ayarları yönetebileceği ve manuel veri çekme işlemi yapabileceği sayfaları içerir.
     [Authorize]
-    public class AdminController : Controller
+    public class AdminController(
+        ApplicationDbContext context,
+        IRecurringJobManager recurringJobManager,
+        MarketDataService marketDataService) : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IRecurringJobManager _recurringJobManager;
-        private readonly MarketDataService _marketDataService;
+        private const string SuccessMessageKey = "SuccessMessage";
+        private const string ErrorMessageKey = "ErrorMessage";
+        private const string DefaultAdminUser = "admin";
+        private const string DefaultAdminPass = "altin2026";
 
-        // Constructor ile gerekli servisleri alıyoruz
-        public AdminController(ApplicationDbContext context, IRecurringJobManager recurringJobManager, MarketDataService marketDataService)
-        {
-            _context = context;
-            _recurringJobManager = recurringJobManager;
-            _marketDataService = marketDataService;
-        }
+        // Sabitler (Magic String çözümü)
+        private const string MenuListAction = "MenuList";
+        private const string SettingsAction = "Settings";
+        private const string SponsorListAction = "SponsorList"; 
 
-        // --- GİRİŞ YAPMA SAYFASI (Buraya herkes girebilir) ---
+        // --- GİRİŞ YAPMA SAYFASI ---
         [AllowAnonymous]
         [HttpGet]
         public IActionResult Login()
         {
-            // Eğer zaten giriş yapmışsa direkt panele yönlendir
-            if (User.Identity != null && User.Identity.IsAuthenticated)
-                return RedirectToAction("Settings");
+            if (User.Identity is { IsAuthenticated: true })
+                return RedirectToAction(SettingsAction);
 
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> Login(string username, string password)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Error = "Lütfen alanları eksiksiz doldurun.";
+                return View();
+            }
+
+            var settings = context.SiteSettings.FirstOrDefault();
+
+            string dbUser = settings?.AdminUsername ?? DefaultAdminUser;
+            string dbPass = settings?.AdminPassword ?? DefaultAdminPass;
+
+            if (username == dbUser && password == dbPass)
+            {
+                List<Claim> claims = [new Claim(ClaimTypes.Name, username)];
+                ClaimsIdentity identity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                ClaimsPrincipal principal = new(identity);
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+                return RedirectToAction(SettingsAction);
+            }
+
+            ViewBag.Error = "Kullanıcı adı veya şifre hatalı kral!";
             return View();
         }
 
@@ -44,43 +73,15 @@ namespace AltinZamani.Controllers
         {
             try
             {
-                await _marketDataService.FetchAndSaveMarketDataAsync();
-                TempData["SuccessMessage"] = "Manuel veri çekme işlemi tetiklendi! Veritabanına o anki fiyatlar başarıyla eklendi.";
+                await marketDataService.FetchAndSaveMarketDataAsync();
+                TempData[SuccessMessageKey] = "Manuel veri çekme işlemi tetiklendi! Veritabanına o anki fiyatlar başarıyla eklendi.";
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Veri çekilirken hata oluştu: {ex.Message}";
+                TempData[ErrorMessageKey] = $"Veri çekilirken hata oluştu: {ex.Message}";
             }
 
-            return RedirectToAction("Settings");
-        }
-
-        // --- GİRİŞ YAPMA İŞLEMİ ---
-        [AllowAnonymous]
-        [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
-        {
-            // Veritabanından güncel şifreyi çekiyoruz 
-            var settings = _context.SiteSettings.FirstOrDefault();
-
-            // Eğer veritabanı boşsa varsayılan olarak admin / altin2026 kabul et
-            string dbUser = settings?.AdminUsername ?? "admin";
-            string dbPass = settings?.AdminPassword ?? "altin2026";
-
-            // Artık veritabanındaki bilgilerle eşleşiyorsa giriş yapacak!
-            if (username == dbUser && password == dbPass)
-            {
-                var claims = new List<Claim> { new Claim(ClaimTypes.Name, username) };
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var principal = new ClaimsPrincipal(identity);
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-                return RedirectToAction("Settings");
-            }
-
-            ViewBag.Error = "Kullanıcı adı veya şifre hatalı kral!";
-            return View();
+            return RedirectToAction(SettingsAction);
         }
 
         // --- ÇIKIŞ YAPMA İŞLEMİ ---
@@ -90,39 +91,41 @@ namespace AltinZamani.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-
         // ==========================================
         //         AYARLAR (SETTINGS) KISMI
         // ==========================================
 
-        // GET: Ayarlar Sayfasını Ekrana Getirir
+        [HttpGet]
         public IActionResult Settings()
         {
-            var setting = _context.SiteSettings.FirstOrDefault();
+            var setting = context.SiteSettings.FirstOrDefault();
             if (setting == null)
             {
-                // Varsayılan ilk ayarlar
                 setting = new SiteSetting
                 {
                     ApiFetchIntervalInHours = 2,
                     DataRetentionDays = 5,
                     MetaTitle = "Altın Zamanı - Canlı Altın ve Döviz",
                     MetaDescription = "Anlık altın fiyatları ve döviz kurları.",
-                    AdminUsername = "admin",
-                    AdminPassword = "altin2026"
+                    AdminUsername = DefaultAdminUser,
+                    AdminPassword = DefaultAdminPass
                 };
-                _context.SiteSettings.Add(setting);
-                _context.SaveChanges();
+                context.SiteSettings.Add(setting);
+                context.SaveChanges();
             }
 
             return View(setting);
         }
 
-        // POST: Ayarları Kaydeder ve Hangfire'ı Günceller
         [HttpPost]
         public IActionResult Settings(SiteSetting model)
         {
-            var setting = _context.SiteSettings.FirstOrDefault();
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var setting = context.SiteSettings.FirstOrDefault();
             if (setting != null)
             {
                 // 1. OTOMASYON AYARLARI
@@ -142,41 +145,194 @@ namespace AltinZamani.Controllers
                 setting.MetaDescription = model.MetaDescription;
                 setting.MetaKeywords = model.MetaKeywords;
 
-                // 4. İLETİŞİM VE SOSYAL MEDYA
+                // 4. İLETİŞİM VE SOSYAL MEDYA 
                 setting.ContactEmail = model.ContactEmail;
                 setting.FooterText = model.FooterText;
+
                 setting.InstagramUrl = model.InstagramUrl;
+                setting.IsInstagramActive = model.IsInstagramActive;
+
                 setting.TwitterUrl = model.TwitterUrl;
+                setting.IsTwitterActive = model.IsTwitterActive;
+
                 setting.FacebookUrl = model.FacebookUrl;
+                setting.IsFacebookActive = model.IsFacebookActive;
 
                 // 5. Admin Bilgileri
                 setting.AdminUsername = model.AdminUsername;
                 setting.AdminPassword = model.AdminPassword;
 
-                _context.SaveChanges();
+                context.SaveChanges();
 
-                // API Çekme Görevi (Hata Korumalı)
                 string apiCron = model.ApiFetchIntervalInHours >= 24
                     ? "0 0 * * *"
                     : $"0 */{model.ApiFetchIntervalInHours} * * *";
 
-                _recurringJobManager.AddOrUpdate<MarketDataService>(
+                recurringJobManager.AddOrUpdate<MarketDataService>(
                     "api-veri-cekme-gorevi",
                     service => service.FetchAndSaveMarketDataAsync(),
                     apiCron
                 );
 
-                // Temizlik Görevi (Sabit Her Gece 01:00)
-                _recurringJobManager.AddOrUpdate<MarketDataService>(
+                recurringJobManager.AddOrUpdate<MarketDataService>(
                     "eski-verileri-temizleme-gorevi",
                     service => service.CleanUpOldDataAsync(),
                     "0 1 * * *"
                 );
 
-                TempData["SuccessMessage"] = "Başarılı!";
+                TempData[SuccessMessageKey] = "Başarılı!";
             }
 
             return View(setting);
+        }
+
+        // ==========================================
+        //         MENÜ YÖNETİMİ (CRUD İŞLEMLERİ)
+        // ==========================================
+
+        public IActionResult MenuList()
+        {
+            var menus = context.Menus.OrderBy(m => m.Order).ToList();
+            return View(menus);
+        }
+
+        public IActionResult CreateMenu()
+        {
+            return View(new Menu { IsActive = true });
+        }
+
+        [HttpPost]
+        public IActionResult CreateMenu(Menu model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            context.Menus.Add(model);
+            context.SaveChanges();
+            TempData[SuccessMessageKey] = "Menü başarıyla eklendi.";
+            return RedirectToAction(MenuListAction);
+        }
+
+        [HttpGet]
+        public IActionResult EditMenu(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction(MenuListAction);
+            }
+
+            var menu = context.Menus.Find(id);
+            if (menu == null) return NotFound();
+
+            return View(menu);
+        }
+
+        [HttpPost]
+        public IActionResult EditMenu(Menu model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            context.Menus.Update(model);
+            context.SaveChanges();
+            TempData[SuccessMessageKey] = "Menü güncellendi.";
+            return RedirectToAction(MenuListAction);
+        }
+
+        [HttpPost]
+        public IActionResult DeleteMenu(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction(MenuListAction);
+            }
+
+            var menu = context.Menus.Find(id);
+            if (menu != null)
+            {
+                context.Menus.Remove(menu);
+                context.SaveChanges();
+            }
+            return RedirectToAction(MenuListAction);
+        }
+
+        // ==========================================
+        //         SPONSOR YÖNETİMİ (CRUD İŞLEMLERİ)
+        // ==========================================
+
+        public IActionResult SponsorList()
+        {
+            var sponsors = context.Sponsors.OrderBy(s => s.Order).ToList();
+            return View(sponsors);
+        }
+
+        [HttpGet]
+        public IActionResult CreateSponsor()
+        {
+            return View(new Sponsor { IsActive = true });
+        }
+
+        [HttpPost]
+        public IActionResult CreateSponsor(Sponsor model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            context.Sponsors.Add(model);
+            context.SaveChanges();
+            TempData[SuccessMessageKey] = "Sponsor başarıyla eklendi.";
+            return RedirectToAction(SponsorListAction);
+        }
+
+        [HttpGet]
+        public IActionResult EditSponsor(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction(SponsorListAction);
+            }
+
+            var sponsor = context.Sponsors.Find(id);
+            if (sponsor == null) return NotFound();
+
+            return View(sponsor);
+        }
+
+        [HttpPost]
+        public IActionResult EditSponsor(Sponsor model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            context.Sponsors.Update(model);
+            context.SaveChanges();
+            TempData[SuccessMessageKey] = "Sponsor güncellendi.";
+            return RedirectToAction(SponsorListAction);
+        }
+
+        [HttpPost]
+        public IActionResult DeleteSponsor(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction(SponsorListAction);
+            }
+
+            var sponsor = context.Sponsors.Find(id);
+            if (sponsor != null)
+            {
+                context.Sponsors.Remove(sponsor);
+                context.SaveChanges();
+            }
+            return RedirectToAction(SponsorListAction);
         }
     }
 }
