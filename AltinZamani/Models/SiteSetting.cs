@@ -5,7 +5,7 @@ namespace AltinZamani.Models
     public class SiteSetting
     {
         [Key]
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string? SiteType { get; set; }
         public string? AdsenseCode { get; set; }
         public string? AnalyticsCode { get; set; }

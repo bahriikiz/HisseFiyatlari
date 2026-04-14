@@ -138,15 +138,29 @@
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label asp-for="InstagramUrl" class="form-label fw-bold">Instagram URL</label>
-                                <input asp-for="InstagramUrl" class="form-control" />
+                                <input asp-for="InstagramUrl" class="form-control" placeholder="https://instagram.com/..." />
+                                <div class="form-check form-switch mt-2">
+                                    <input asp-for="IsInstagramActive" class="form-check-input" type="checkbox" id="instaswitch" />
+                                    <label class="form-check-label text-muted small" for="instaswitch">İkonu Göster</label>
+                                </div>
                             </div>
+
                             <div class="col-md-4 mb-3">
                                 <label asp-for="TwitterUrl" class="form-label fw-bold">Twitter URL</label>
-                                <input asp-for="TwitterUrl" class="form-control" />
+                                <input asp-for="TwitterUrl" class="form-control" placeholder="https://twitter.com/..." />
+                                <div class="form-check form-switch mt-2">
+                                    <input asp-for="IsTwitterActive" class="form-check-input" type="checkbox" id="twitswitch" />
+                                    <label class="form-check-label text-muted small" for="twitswitch">İkonu Göster</label>
+                                </div>
                             </div>
+
                             <div class="col-md-4 mb-3">
                                 <label asp-for="FacebookUrl" class="form-label fw-bold">Facebook URL</label>
-                                <input asp-for="FacebookUrl" class="form-control" />
+                                <input asp-for="FacebookUrl" class="form-control" placeholder="https://facebook.com/..." />
+                                <div class="form-check form-switch mt-2">
+                                    <input asp-for="IsFacebookActive" class="form-check-input" type="checkbox" id="faceswitch" />
+                                    <label class="form-check-label text-muted small" for="faceswitch">İkonu Göster</label>
+                                </div>
                             </div>
                         </div>
                     </div>

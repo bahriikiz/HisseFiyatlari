@@ -75,7 +75,6 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Menüyü aç">
                     <span class="navbar-toggler-icon"></span>
-                    <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end kurumsal-menu">
@@ -88,15 +87,6 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">@(isEn ? "MARKETS" : "PİYASALAR")</a>
                         </li>
-
-                        @foreach (var menu in dynamicMenus)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Home" asp-action="Page" asp-route-slug="@menu.Slug">
-                                    @menu.Title
-                                </a>
-                            </li>
-                        }
 
                         @foreach (var menu in dynamicMenus)
                         {
@@ -127,7 +117,7 @@
                         }
 
                         <li class="nav-item ms-lg-3">
-                            <a class="nav-link" href="#" style="font-size: 1.1rem;"><i class="bi bi-search"></i></a>
+                            <a class="nav-link" href="#" style="font-size: 1.1rem;" aria-label="Sitede Ara"><i class="bi bi-search"></i></a>
                         </li>
 
                         <li class="nav-item ms-lg-1">
@@ -218,23 +208,26 @@
                 </div>
                 <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
                     <div class="social-links mb-2">
-                        @if (!string.IsNullOrEmpty(settings.InstagramUrl) && settings.IsInstagramActive)
+                        @if (settings.IsInstagramActive && !string.IsNullOrEmpty(settings.InstagramUrl))
                         {
-                            <a href="@settings.InstagramUrl" target="_blank" class="text-danger fs-4 me-3"><i class="bi bi-instagram"></i></a>
+                            <a href="@settings.InstagramUrl" target="_blank" class="text-danger fs-4 me-3" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
                         }
-                        @if (!string.IsNullOrEmpty(settings.TwitterUrl) && settings.IsTwitterActive)
+
+                        @if (settings.IsTwitterActive && !string.IsNullOrEmpty(settings.TwitterUrl))
                         {
-                            <a href="@settings.TwitterUrl" target="_blank" class="text-dark fs-4 me-3"><i class="bi bi-twitter-x"></i></a>
+                            <a href="@settings.TwitterUrl" target="_blank" class="text-dark fs-4 me-3" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
                         }
-                        @if (!string.IsNullOrEmpty(settings.FacebookUrl) && settings.IsFacebookActive)
+
+                        @if (settings.IsFacebookActive && !string.IsNullOrEmpty(settings.FacebookUrl))
                         {
-                            <a href="@settings.FacebookUrl" target="_blank" style="color:#0d6efd;" class="fs-4"><i class="bi bi-facebook"></i></a>
+                            <a href="@settings.FacebookUrl" target="_blank" style="color:#0d6efd;" class="fs-4" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
                         }
                     </div>
                     @if (!string.IsNullOrEmpty(settings.ContactEmail))
                     {
                         <div class="small text-muted">
-                            <i class="bi bi-envelope-at me-1"></i>@settings.ContactEmail
+                            <i class="bi bi-envelope-at me-1"></i>
+                            <a href="mailto:@settings.ContactEmail" class="text-decoration-none text-muted">@settings.ContactEmail</a>
                         </div>
                     }
                 </div>
