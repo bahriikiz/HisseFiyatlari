@@ -1,11 +1,14 @@
 ﻿using AltinZamani.Data;
+using AltinZamani.Hubs; 
 using AltinZamani.Models;
+using Microsoft.AspNetCore.SignalR; 
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace AltinZamani.Services;
 
-public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataService> logger, HttpClient httpClient, IConfiguration configuration)
+
+public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataService> logger, HttpClient httpClient, IConfiguration configuration, IHubContext<MarketHub> hubContext)
 {
     public async Task FetchAndSaveMarketDataAsync()
     {
@@ -25,6 +28,7 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
 
         await context.MarketDatas.AddRangeAsync(fetchedData);
         await context.SaveChangesAsync();
+        await hubContext.Clients.All.SendAsync("ReceiveMarketUpdate");
     }
 
     private void SetupHttpClient()
@@ -134,7 +138,7 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
     public async Task CleanUpOldDataAsync()
     {
         var setting = await context.SiteSettings.FirstOrDefaultAsync();
-        int retentionDays = setting?.DataRetentionDays ?? 5; 
+        int retentionDays = setting?.DataRetentionDays ?? 5;
 
         var thresholdDate = DateTime.Today.AddDays(-retentionDays);
 

@@ -1,46 +1,45 @@
 using AltinZamani.Data;
 using AltinZamani.Services;
+using AltinZamani.Hubs;
 using Microsoft.EntityFrameworkCore;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Kimlik Doðrulama Ayarlarý
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Admin/Login"; 
+        options.LoginPath = "/Admin/Login";
         options.LogoutPath = "/Admin/Logout";
-        options.ExpireTimeSpan = TimeSpan.FromHours(1); // 1 saat boþta kalýrsa at
+        options.ExpireTimeSpan = TimeSpan.FromHours(1);
     });
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
-
-// HttpClient servisini sisteme tanýtýyoruz (API çaðrýlarý için kullanacaðýz)
 builder.Services.AddHttpClient();
 
-// MarketDataService'i sisteme tanýtýyoruz (veri çekme ve veritabanýna kaydetme iþlemleri için)
+// Servis Kayýtlarý
 builder.Services.AddScoped<MarketDataService>();
 
-// Veritabaný (DbContext) baðlantýmýzý sisteme tanýtýyoruz
+// Veritabaný Baðlantýsý
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 
-// --- HANGFIRE SERVÝS KURULUMLARI (Burasý silinmiþti, geri ekledik) ---
+// Hangfire Kurulumu
 builder.Services.AddHangfire(configuration => configuration
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
     .UseSqlServerStorage(builder.Configuration.GetConnectionString("SqlServer")));
 
-// Hangfire arka plan iþleyicisini (Sunucusunu) baþlatýyoruz
 builder.Services.AddHangfireServer();
 
+// SignalR Kaydý
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -56,25 +55,37 @@ app.UseAuthorization();
 
 app.UseHangfireDashboard("/hangfire");
 
+// ==========================================
+// DÝNAMÝK GÖREV YÖNETÝMÝ (PANEL AYARLARINA GÖRE)
+// ==========================================
 using (var scope = app.Services.CreateScope())
 {
-    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    var services = scope.ServiceProvider;
+    var recurringJobManager = services.GetRequiredService<IRecurringJobManager>();
+    var dbContext = services.GetRequiredService<ApplicationDbContext>();
 
-    // 1. Görev: API'den Veri Çekme (Her 2 saatte bir çalýþýr)
+    // Veritabanýndaki yönetici ayarlarýný çekiyoruz
+    var settings = dbContext.SiteSettings.FirstOrDefault();
+
+    // 1. Veri Çekme Sýklýðý Ayarý
+    int fetchInterval = settings?.ApiFetchIntervalInHours ?? 2;
+    string fetchCron = fetchInterval >= 24 ? "0 0 * * *" : $"0 */{fetchInterval} * * *";
+
     recurringJobManager.AddOrUpdate<MarketDataService>(
         "api-veri-cekme-gorevi",
         service => service.FetchAndSaveMarketDataAsync(),
-        "0 */2 * * *"
+        fetchCron
     );
 
-    // 2. Görev: Eski Verileri Temizleme (Her gece saat 01:00'da çalýþýr)
+    // 2. Veri Silme/Temizleme Ayarý
     recurringJobManager.AddOrUpdate<MarketDataService>(
         "eski-verileri-temizleme-gorevi",
         service => service.CleanUpOldDataAsync(),
-        Cron.Daily(7, 0)
+        "0 1 * * *"
     );
 }
 
+app.MapHub<MarketHub>("/marketHub");
 
 app.MapControllerRoute(
     name: "default",
