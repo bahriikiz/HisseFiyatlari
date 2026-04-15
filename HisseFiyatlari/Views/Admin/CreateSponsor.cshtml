@@ -1,0 +1,63 @@
+﻿@model HisseFiyatlari.Models.Sponsor
+@{
+    ViewData["Title"] = "Yeni Sponsor Ekle";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header bg-warning text-dark py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-megaphone-fill me-2"></i> Yeni Sponsor Ekle</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="CreateSponsor" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Name" class="form-label fw-bold"></label>
+                                <input asp-for="Name" class="form-control" required />
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="WebsiteLink" class="form-label fw-bold"></label>
+                                <input asp-for="WebsiteLink" class="form-control" placeholder="https://..." />
+                            </div>
+                        </div>
+
+                        <div class="card bg-light border-0 rounded-3 mb-4 p-3">
+                            <h6 class="fw-bold mb-3"><i class="bi bi-image me-2"></i>Sponsor Logosu</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ImageFile" class="form-label fw-bold small text-muted">Bilgisayardan Seç (JPG, PNG, SVG)</label>
+                                    <input asp-for="ImageFile" type="file" class="form-control form-control-sm" accept=".jpg,.jpeg,.png,.svg,.ico" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="LogoUrl" class="form-label fw-bold small text-muted">VEYA Resim Linki</label>
+                                    <input asp-for="LogoUrl" class="form-control form-control-sm" placeholder="https://site.com/logo.png" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="Order" class="form-label fw-bold"></label>
+                                <input asp-for="Order" type="number" class="form-control" value="1" />
+                            </div>
+                            <div class="col-md-6 mb-4 d-flex align-items-end pb-2">
+                                <div class="form-check form-switch">
+                                    <input asp-for="IsActive" class="form-check-input fs-5" type="checkbox" id="isActiveSwitch" checked>
+                                    <label class="form-check-label ms-2 pt-1 fw-bold text-success" for="isActiveSwitch">Sitede Aktif</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="SponsorList" class="btn btn-outline-secondary fw-bold">Geri Dön</a>
+                            <button type="submit" class="btn btn-warning fw-bold px-4 text-dark"><i class="bi bi-save me-1"></i> Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

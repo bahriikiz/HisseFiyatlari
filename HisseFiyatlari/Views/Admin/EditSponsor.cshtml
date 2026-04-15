@@ -1,0 +1,73 @@
+﻿@model HisseFiyatlari.Models.Sponsor
+@{
+    ViewData["Title"] = "Sponsor Düzenle";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header bg-warning text-dark py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i> Sponsor Düzenle</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="EditSponsor" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="LogoUrl" /> <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Name" class="form-label fw-bold"></label>
+                                <input asp-for="Name" class="form-control" required />
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="WebsiteLink" class="form-label fw-bold"></label>
+                                <input asp-for="WebsiteLink" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="card bg-light border-0 rounded-3 mb-4 p-3">
+                            <h6 class="fw-bold mb-3"><i class="bi bi-image me-2"></i>Sponsor Logosu</h6>
+
+                            @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                            {
+                                <div class="mb-3 p-2 bg-white rounded border d-inline-block">
+                                    <span class="small text-muted d-block mb-1">Mevcut Logo:</span>
+                                    <img src="@Model.LogoUrl" style="max-height: 50px;" class="img-fluid" />
+                                </div>
+                            }
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ImageFile" class="form-label fw-bold small text-muted">Yeni Dosya Seç (İsteğe Bağlı)</label>
+                                    <input asp-for="ImageFile" type="file" class="form-control form-control-sm" accept=".jpg,.jpeg,.png,.svg,.ico" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="LogoUrlInput" class="form-label fw-bold small text-muted">VEYA Resim Linki</label>
+                                    <input type="text" id="LogoUrlInput" name="LogoUrl" value="@Model.LogoUrl" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="Order" class="form-label fw-bold"></label>
+                                <input asp-for="Order" type="number" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-4 d-flex align-items-end pb-2">
+                                <div class="form-check form-switch">
+                                    <input asp-for="IsActive" class="form-check-input fs-5" type="checkbox" id="isActiveSwitchEdit">
+                                    <label class="form-check-label ms-2 pt-1 fw-bold text-success" for="isActiveSwitchEdit">Sitede Aktif</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="SponsorList" class="btn btn-outline-secondary fw-bold">Geri Dön</a>
+                            <button type="submit" class="btn btn-warning fw-bold px-4 text-dark"><i class="bi bi-save me-1"></i> Değişiklikleri Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

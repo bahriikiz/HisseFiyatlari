@@ -1,0 +1,201 @@
+﻿@model HisseFiyatlari.Models.SiteSetting
+
+@{
+    ViewData["Title"] = "Sistem Ayarları";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold mb-0"><i class="bi bi-sliders"></i> Yönetim Paneli</h2>
+
+                <form asp-controller="Admin" asp-action="TriggerManualFetch" method="post" class="m-0">
+                    <button type="submit" class="btn btn-info fw-bold shadow-sm text-white">
+                        <i class="bi bi-cloud-download-fill"></i> Piyasayı Şimdi Güncelle
+                    </button>
+                </form>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i> <strong>Başarılı!</strong> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> <strong>Hata!</strong> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <form asp-controller="Admin" asp-action="Settings" method="post">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-search"></i> SEO ve Google Ayarları</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label asp-for="MetaTitle" class="form-label fw-bold">Site Başlığı (Title)</label>
+                            <input asp-for="MetaTitle" class="form-control" placeholder="Google'da görünecek ana başlık" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="MetaDescription" class="form-label fw-bold">Site Açıklaması (Description)</label>
+                            <textarea asp-for="MetaDescription" class="form-control" rows="3" placeholder="Sitenizi anlatan özet..."></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MetaKeywords" class="form-label fw-bold">Anahtar Kelimeler</label>
+                                <input asp-for="MetaKeywords" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AnalyticsCode" class="form-label fw-bold">Google Analytics (G-XXXXX)</label>
+                                <input asp-for="AnalyticsCode" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-header bg-dark text-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-gear-fill"></i> Otomasyon Ayarları</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ApiFetchIntervalInHours" class="form-label fw-bold">API Çekme Sıklığı (Saat)</label>
+                                <input asp-for="ApiFetchIntervalInHours" type="number" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DataRetentionDays" class="form-label fw-bold">Veri Saklama Süresi (Gün)</label>
+                                <input asp-for="DataRetentionDays" type="number" class="form-control" />
+                            </div>
+                        </div>
+                        <small class="text-muted fst-italic">Not: API sıklığı değiştiğinde Hangfire görevleri anlık güncellenir.</small>
+                    </div>
+                </div>
+
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-header bg-warning text-dark py-3">
+                        <h5 class="mb-0"><i class="bi bi-layout-three-columns"></i> Reklam Yerleşim Merkezi</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label asp-for="AdsenseCode" class="form-label fw-bold text-primary">Global AdSense Kodu (Header Script)</label>
+                            <textarea asp-for="AdsenseCode" class="form-control" rows="2" placeholder="Auto-Ads script kodu buraya..."></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="TopAdCode" class="form-label fw-bold text-danger">Tepe Reklam Alanı (Navbar Altı - 728x90)</label>
+                            <textarea asp-for="TopAdCode" class="form-control" rows="2" placeholder="Tepe banner kodu..."></textarea>
+                        </div>
+
+                        <hr />
+
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LeftAdCode" class="form-label fw-bold text-success">Sol Kenar Reklamı (Dikey)</label>
+                                <textarea asp-for="LeftAdCode" class="form-control" rows="4" placeholder="Sol dikey reklam kodu..."></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RightAdCode" class="form-label fw-bold text-success">Sağ Kenar Reklamı (Dikey)</label>
+                                <textarea asp-for="RightAdCode" class="form-control" rows="4" placeholder="Sağ dikey reklam kodu..."></textarea>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="mb-0">
+                            <label asp-for="BannerAdCode" class="form-label fw-bold text-primary">Ana Sayfa - Grafik Üstü Banner</label>
+                            <textarea asp-for="BannerAdCode" class="form-control" rows="2" placeholder="Yatay banner kodu..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-header bg-secondary text-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-share-fill"></i> İletişim ve Sosyal Medya</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="ContactEmail" class="form-label fw-bold">İletişim E-posta</label>
+                                <input asp-for="ContactEmail" class="form-control" type="email" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="ContactPhone" class="form-label fw-bold">İletişim Telefonu</label>
+                                <input asp-for="ContactPhone" class="form-control" placeholder="05XX XXX XX XX" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="FooterText" class="form-label fw-bold">Footer Yazısı</label>
+                                <input asp-for="FooterText" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="InstagramUrl" class="form-label fw-bold">Instagram URL</label>
+                                <input asp-for="InstagramUrl" class="form-control" placeholder="https://instagram.com/..." />
+                                <div class="form-check form-switch mt-2">
+                                    <input asp-for="IsInstagramActive" class="form-check-input" type="checkbox" id="instaswitch" />
+                                    <label class="form-check-label text-muted small" for="instaswitch">İkonu Göster</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="TwitterUrl" class="form-label fw-bold">Twitter URL</label>
+                                <input asp-for="TwitterUrl" class="form-control" placeholder="https://twitter.com/..." />
+                                <div class="form-check form-switch mt-2">
+                                    <input asp-for="IsTwitterActive" class="form-check-input" type="checkbox" id="twitswitch" />
+                                    <label class="form-check-label text-muted small" for="twitswitch">İkonu Göster</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="FacebookUrl" class="form-label fw-bold">Facebook URL</label>
+                                <input asp-for="FacebookUrl" class="form-control" placeholder="https://facebook.com/..." />
+                                <div class="form-check form-switch mt-2">
+                                    <input asp-for="IsFacebookActive" class="form-check-input" type="checkbox" id="faceswitch" />
+                                    <label class="form-check-label text-muted small" for="faceswitch">İkonu Göster</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-header bg-danger text-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Güvenlik Ayarları (Giriş Bilgileri)</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AdminUsername" class="form-label fw-bold">Yönetici Kullanıcı Adı</label>
+                                <input asp-for="AdminUsername" class="form-control" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AdminPassword" class="form-label fw-bold">Yönetici Şifresi</label>
+                                <input asp-for="AdminPassword" type="text" class="form-control" required />
+                                <small class="text-muted">Şifrenizi unutursanız veritabanından müdahale etmeniz gerekir, dikkatli değiştirin!</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-lg shadow-sm">
+                        <i class="bi bi-save"></i> Tüm Ayarları Kaydet ve Yayına Al
+                    </button>
+                    <a href="/" class="btn btn-link text-muted">Ana Sayfaya Dön</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

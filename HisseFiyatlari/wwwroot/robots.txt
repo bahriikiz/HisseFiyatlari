@@ -1,0 +1,4 @@
+﻿User-agent: *
+Allow: /
+// buraya sitenizin adresini yazın
+Sitemap: https://HisseFiyatlari.com/sitemap.xml
