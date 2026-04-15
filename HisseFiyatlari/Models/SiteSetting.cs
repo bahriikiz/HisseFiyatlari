@@ -26,12 +26,12 @@ namespace HisseFiyatlari.Models
         public string? LeftAdCode { get; set; }      // Sol dikey reklam
         public string? RightAdCode { get; set; }     // Sağ dikey reklam
         // --- SEO Ayarları ---
-        public string? MetaTitle { get; set; } = "Altın Zamanı - Canlı Altın ve Döviz Fiyatları";
+        public string? MetaTitle { get; set; } = "Hisse Fiyatları - Canlı Altın ve Döviz Fiyatları";
         public string? MetaDescription { get; set; } = "En güncel altın fiyatları, çeyrek altın, gram altın ve canlı döviz kurlarını anlık takip edin.";
         public string? MetaKeywords { get; set; } = "altın, çeyrek altın, gram altın, döviz, canlı borsa, dolar, euro";
 
         // --- GÜVENLİK AYARLARI ---
         public string AdminUsername { get; set; } = "admin";
-        public string AdminPassword { get; set; } = "altin2026";
+        public string AdminPassword { get; set; } = "borsa2026";
     }
 }

@@ -16,7 +16,7 @@
     <title>@settings.MetaTitle</title>
     <meta name="description" content="@settings.MetaDescription" />
     <meta name="keywords" content="@settings.MetaKeywords" />
-    <meta name="author" content="Altın Zamanı" />
+    <meta name="author" content="Hisse Fiyatları" />
 
     @if (!isAdminPage && !string.IsNullOrEmpty(settings.AdsenseCode))
     {
@@ -49,7 +49,7 @@
         }
 
             .kurumsal-menu .nav-link:hover {
-                color: #ffc107 !important;
+                color: #198754 !important;
             }
 
         .kurumsal-logo-yazi {
@@ -104,7 +104,7 @@
             .partner-card:hover {
                 transform: translateY(-5px);
                 box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-                border-color: #ffc107;
+                border-color: #198754;
                 color: #0d3b66;
             }
     </style>
@@ -261,7 +261,7 @@
                     @foreach (var sponsor in activeSponsors)
                     {
                         <div class="card mb-3 border-0 shadow-sm text-center p-2">
-                            <a href="@sponsor.WebsiteLink" target="_blank" title="@sponsor.Name" class="text-decoration-none">
+                            <a href="@sponsor.WebsiteLink" target="_btle="@sponsor.Name" class="text-decoration-none">
                                 @if (!string.IsNullOrEmpty(sponsor.LogoUrl))
                                 {
                                     <img src="@sponsor.LogoUrl" class="img-fluid mb-2 rounded" alt="@sponsor.Name" style="max-height: 80px;">
@@ -344,7 +344,7 @@
         <div class="container-fluid px-lg-5">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start">
-                    <span class="fw-bold" style="color:#0d3b66;">© @DateTime.Now.Year - Altın Zamanı</span>
+                    <span class="fw-bold" style="color:#0d3b66;">© @DateTime.Now.Year - Hisse Fiyatları</span>
                     @if (!string.IsNullOrEmpty(settings.FooterText))
                     {
                         <p class="small mb-0 mt-1">@settings.FooterText</p>

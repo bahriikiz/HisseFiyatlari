@@ -1,12 +1,11 @@
-﻿using HisseFiyatlari.Data;
+﻿using Hangfire;
+using HisseFiyatlari.Data;
 using HisseFiyatlari.Models;
 using HisseFiyatlari.Services;
-using Hangfire;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace HisseFiyatlari.Controllers
@@ -21,7 +20,7 @@ namespace HisseFiyatlari.Controllers
         private const string SuccessMessageKey = "SuccessMessage";
         private const string ErrorMessageKey = "ErrorMessage";
         private const string DefaultAdminUser = "admin";
-        private const string DefaultAdminPass = "altin2026";
+        private const string DefaultAdminPass = "borsa2026";
 
         // Sabitler (Magic String çözümü)
         private const string MenuListAction = "MenuList";
@@ -107,7 +106,7 @@ namespace HisseFiyatlari.Controllers
                 {
                     ApiFetchIntervalInHours = 2,
                     DataRetentionDays = 5,
-                    MetaTitle = "Altın Zamanı - Canlı Altın ve Döviz",
+                    MetaTitle = "Hisse Fiyatları - Canlı Altın ve Döviz",
                     MetaDescription = "Anlık altın fiyatları ve döviz kurları.",
                     AdminUsername = DefaultAdminUser,
                     AdminPassword = DefaultAdminPass

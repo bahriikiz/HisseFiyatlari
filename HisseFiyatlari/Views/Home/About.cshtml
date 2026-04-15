@@ -4,54 +4,53 @@
     bool isEn = lang == "en";
 }
 
-<div class="container py-5 mb-5">
-    <div class="row align-items-center mb-5">
-        <div class="col-lg-6 mb-4 mb-lg-0">
-            <h1 class="display-4 fw-bold text-dark mb-3">
-                @(isEn ? "About" : "Hakkımızda") <br />
-                <span class="text-warning">@(isEn ? "Golden Time" : "Altın Zamanı")</span>
-            </h1>
-            <p class="lead text-muted fw-bold">
-                @(isEn ? "We provide the most accurate, fast, and reliable market data to our users." : "Kullanıcılarımıza en doğru, en hızlı ve en güvenilir piyasa verilerini sunmak için buradayız.")
-            </p>
-            <p class="mb-4 text-secondary" style="font-size: 1.1rem; line-height: 1.8;">
-                @(isEn ? "Since our establishment, we have been closely monitoring the pulse of the financial markets. We compile live gold prices, exchange rates, and crypto market data under one roof. Our platform is designed with advanced infrastructure to ensure you don't miss a single moment of market volatility." : "Kurulduğumuz günden bu yana finans piyasalarının nabzını tutuyoruz. Canlı altın fiyatları, döviz kurları ve global piyasalardaki tüm gelişmeleri tek bir çatı altında topluyor, yatırımcıların anlık kararlar alabilmesi için güçlü bir altyapı ile hizmet veriyoruz.")
-            </p>
-            <a href="/Home/Contact" class="btn btn-outline-primary btn-lg fw-bold rounded-pill px-4">
-                <i class="bi bi-chat-dots me-2"></i>@(isEn ? "Get in Touch" : "Bizimle İletişime Geçin")
-            </a>
-        </div>
-        <div class="col-lg-6 text-center">
-            <div class="bg-white p-5 rounded-circle d-inline-flex align-items-center justify-content-center shadow-lg" style="width: 300px; height: 300px; border: 10px solid #f8f9fa;">
-                <i class="bi bi-bank text-warning" style="font-size: 8rem;"></i>
-            </div>
-        </div>
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold" style="color: #0d3b66;">
+            @(isEn ? "STOCK" : "HİSSE") <span class="text-success">@(isEn ? "PRICES" : "FİYATLARI")</span>
+        </h2>
+        <p class="lead text-muted">
+            @(isEn ? "Track live stock market data, shares, and indices instantly." : "Canlı borsa verilerini, hisse senetlerini ve endeksleri anlık takip edin.")
+        </p>
     </div>
 
-    <div class="row g-4 mt-2">
-        <div class="col-md-6">
-            <div class="card h-100 border-0 shadow-sm rounded-4" style="border-top: 6px solid #0d6efd !important;">
-                <div class="card-body p-5">
-                    <div class="mb-3">
-                        <i class="bi bi-bullseye text-primary" style="font-size: 2.5rem;"></i>
-                    </div>
-                    <h3 class="fw-bold mb-3">@(isEn ? "Our Mission" : "Misyonumuz")</h3>
-                    <p class="text-muted mb-0 fs-5">
-                        @(isEn ? "To ensure our users have access to transparent, ad-free, and real-time financial data, guiding them to make the best possible investment decisions." : "Kullanıcılarımızın şeffaf, hızlı ve eş zamanlı finansal verilere en kolay şekilde ulaşmasını sağlayarak, yatırımlarına güvenle yön vermelerine rehberlik etmek.")
-                    </p>
+    <div class="row g-4 text-center">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 py-4" style="border-radius: 15px;">
+                <div class="card-body">
+                    <i class="bi bi-activity text-success mb-3" style="font-size: 2.5rem;"></i>
+                    <h5 class="fw-bold">@(isEn ? "Live Tracking" : "Canlı Takip")</h5>
+                    <p class="text-muted small mb-0">@(isEn ? "Follow BIST data and stocks second by second." : "BİST verilerini ve hisse senetlerini saniyesi saniyesine takip edin.")</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card h-100 border-0 shadow-sm rounded-4" style="border-top: 6px solid #ffc107 !important;">
-                <div class="card-body p-5">
-                    <div class="mb-3">
-                        <i class="bi bi-eye text-warning" style="font-size: 2.5rem;"></i>
-                    </div>
-                    <h3 class="fw-bold mb-3">@(isEn ? "Our Vision" : "Vizyonumuz")</h3>
-                    <p class="text-muted mb-0 fs-5">
-                        @(isEn ? "To become the most reliable, widely used, and technologically advanced financial data platform both locally and globally." : "Sadece Türkiye'de değil, küresel çapta en çok güvenilen, teknolojik altyapısıyla sektöre yön veren lider finans platformu olmak.")
-                    </p>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 py-4" style="border-radius: 15px;">
+                <div class="card-body">
+                    <i class="bi bi-shield-check text-primary mb-3" style="font-size: 2.5rem;"></i>
+                    <h5 class="fw-bold">@(isEn ? "Reliable Data" : "Güvenilir Veri")</h5>
+                    <p class="text-muted small mb-0">@(isEn ? "Our data is provided instantly from reliable global financial sources." : "Verilerimiz global ve güvenilir finans kaynaklarından anlık olarak sağlanır.")</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 py-4" style="border-radius: 15px;">
+                <div class="card-body">
+                    <i class="bi bi-phone text-warning mb-3" style="font-size: 2.5rem;"></i>
+                    <h5 class="fw-bold">@(isEn ? "Mobile Friendly" : "Mobil Uyumlu")</h5>
+                    <p class="text-muted small mb-0">@(isEn ? "Watch the stock market seamlessly from any device you want." : "İstediğiniz her cihazdan borsayı ve portföyünüzü kesintisiz izleyin.")</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 py-4" style="border-radius: 15px;">
+                <div class="card-body">
+                    <i class="bi bi-gift text-danger mb-3" style="font-size: 2.5rem;"></i>
+                    <h5 class="fw-bold">@(isEn ? "Free" : "Ücretsiz")</h5>
+                    <p class="text-muted small mb-0">@(isEn ? "All our live market features are completely free." : "Tüm canlı borsa özelliklerimiz ve analiz araçlarımız tamamen ücretsizdir.")</p>
                 </div>
             </div>
         </div>

@@ -1,19 +1,19 @@
 ﻿using HisseFiyatlari.Data;
-using HisseFiyatlari.Hubs; 
+using HisseFiyatlari.Hubs;
 using HisseFiyatlari.Models;
-using Microsoft.AspNetCore.SignalR; 
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace HisseFiyatlari.Services;
-
 
 public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataService> logger, HttpClient httpClient, IConfiguration configuration, IHubContext<MarketHub> hubContext)
 {
     public async Task FetchAndSaveMarketDataAsync()
     {
         SetupHttpClient();
-        // API URL'sini yapılandırma dosyasından alıyoruz.
+
+        // API URL'sini yapılandırma dosyasından alıyoruz (Yahoo Finance linki olmalı)
         string apiUrl = configuration["MarketApi:Url"] ?? throw new InvalidOperationException("API URL yapılandırma dosyasında (appsettings.json 'MarketApi:Url') bulunamadı!");
 
         var jsonString = await FetchJsonFromApiAsync(apiUrl);
@@ -23,20 +23,22 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
 
         if (fetchedData.Count == 0)
         {
-            throw new InvalidOperationException("JSON başarıyla okundu ancak listeye eklenecek geçerli hiçbir fiyat bulunamadı!");
+            throw new InvalidOperationException("JSON başarıyla okundu ancak listeye eklenecek geçerli hiçbir hisse fiyatı bulunamadı!");
         }
 
         await context.MarketDatas.AddRangeAsync(fetchedData);
         await context.SaveChangesAsync();
+
+        // Ön yüze canlı güncelleme tetiklemesi gönderiyoruz
         await hubContext.Clients.All.SendAsync("ReceiveMarketUpdate");
     }
-    // Diğer yardımcı metotlar burada...
+
     private void SetupHttpClient()
     {
         httpClient.DefaultRequestHeaders.Clear();
         httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
     }
-    // API'den JSON verisini çekme ve temel doğrulama işlemi
+
     private async Task<string> FetchJsonFromApiAsync(string apiUrl)
     {
         var response = await httpClient.GetAsync(apiUrl);
@@ -72,67 +74,69 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
     {
         var fetchedData = new List<MarketData>();
 
-        foreach (var property in root.EnumerateObject())
+        try
         {
-            if (property.Name == "Update_Date" || property.Name == "guncellenme_zamani")
-                continue;
-
-            try
+            // Yahoo Finance JSON yapısında asıl veri quoteResponse -> result dizisinin içindedir
+            if (root.TryGetProperty("quoteResponse", out var quoteResponse) &&
+                quoteResponse.TryGetProperty("result", out var resultList))
             {
-                var marketItem = ProcessMarketDataItem(property);
-                if (marketItem != null)
+                foreach (var item in resultList.EnumerateArray())
                 {
-                    fetchedData.Add(marketItem);
+                    var marketItem = ProcessMarketDataItem(item);
+                    if (marketItem != null)
+                    {
+                        fetchedData.Add(marketItem);
+                    }
                 }
             }
-            catch (Exception ex)
+            else
             {
-                logger.LogWarning(ex, "Dönüştürülemedi: {PropertyName} - {ErrorMessage}", property.Name, ex.Message);
+                logger.LogWarning("Yahoo Finance JSON formatı beklenenden farklı. 'quoteResponse.result' yolu bulunamadı.");
             }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Yahoo Finance JSON verisi işlenirken bir hata oluştu!");
         }
 
         return fetchedData;
     }
 
-    private static MarketData? ProcessMarketDataItem(JsonProperty property)
+    private static MarketData? ProcessMarketDataItem(JsonElement item)
     {
-        var element = property.Value;
-
-        string sellingStr = ExtractValue(element, "Selling", "Satış");
-        string changeStr = ExtractValue(element, "Change", "Değişim");
-
-        changeStr = changeStr.Replace("%", "").Trim();
-
-        decimal lastPrice = ParseToDecimal(sellingStr);
-        decimal changePercentage = ParseToDecimal(changeStr);
-
-        if (lastPrice > 0)
+        try
         {
-            return new MarketData
+            // Hisse kodunu alıyoruz ve ekranda temiz görünmesi için sonundaki ".IS" takısını atıyoruz
+            string symbol = item.TryGetProperty("symbol", out var symProp) ? symProp.GetString()?.Replace(".IS", "") ?? "Bilinmeyen" : "Bilinmeyen";
+
+            // Sayısal değerleri JSON elementinden doğrudan decimal ve long olarak çekiyoruz
+            decimal lastPrice = item.TryGetProperty("regularMarketPrice", out var priceProp) ? priceProp.GetDecimal() : 0;
+            decimal changePercentage = item.TryGetProperty("regularMarketChangePercent", out var changeProp) ? changeProp.GetDecimal() : 0;
+            decimal changeAmount = item.TryGetProperty("regularMarketChange", out var changeAmtProp) ? changeAmtProp.GetDecimal() : 0;
+            long volumeCount = item.TryGetProperty("regularMarketVolume", out var volProp) ? volProp.GetInt64() : 0;
+
+            if (lastPrice > 0)
             {
-                SiteType = "HisseFiyatlari",
-                Name = property.Name,
-                LastPrice = lastPrice,
-                ChangePercentage = changePercentage,
-                ChangeAmount = 0,
-                VolumeAmount = null,
-                VolumeCount = null,
-                RecordDate = DateTime.Now
-            };
+                return new MarketData
+                {
+                    SiteType = "HisseFiyatlari",
+                    Name = symbol,
+                    LastPrice = lastPrice,
+                    ChangePercentage = changePercentage,
+                    ChangeAmount = changeAmount,
+                    VolumeAmount = null, // Eğer Yahoo hacmi parasal değer olarak verirse buraya eklenebilir
+                    VolumeCount = (int)(volumeCount / 1000), // Çok büyük sayıları önlemek için "Bin Lot" cinsinden kaydediyoruz
+                    RecordDate = DateTime.Now
+                };
+            }
+        }
+        catch (Exception)
+        {
+            // Eğer bir hissenin verisinde bozukluk varsa sistemi durdurmaması için sadece o hisseyi atlıyoruz
+            return null;
         }
 
         return null;
-    }
-
-    private static string ExtractValue(JsonElement element, string propName1, string propName2)
-    {
-        if (element.TryGetProperty(propName1, out var prop1) && prop1.ValueKind != JsonValueKind.Null)
-            return prop1.ToString();
-
-        if (element.TryGetProperty(propName2, out var prop2) && prop2.ValueKind != JsonValueKind.Null)
-            return prop2.ToString();
-
-        return "0";
     }
 
     public async Task CleanUpOldDataAsync()
@@ -151,29 +155,5 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
             context.MarketDatas.RemoveRange(oldRecords);
             await context.SaveChangesAsync();
         }
-    }
-
-    private static decimal ParseToDecimal(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value) || value == "0") return 0;
-
-        value = value.Replace(" ", "").Replace("₺", "").Replace("$", "").Replace("€", "");
-
-        if (value.Contains(',') && value.Contains('.'))
-        {
-            value = value.Replace(".", "");
-            value = value.Replace(',', '.');
-        }
-        else if (value.Contains(','))
-        {
-            value = value.Replace(',', '.');
-        }
-
-        if (decimal.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal result))
-        {
-            return result;
-        }
-
-        return 0;
     }
 }

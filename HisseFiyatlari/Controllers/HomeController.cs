@@ -165,7 +165,7 @@ namespace HisseFiyatlari.Controllers
 
                     var mailMessage = new System.Net.Mail.MailMessage
                     {
-                        From = new System.Net.Mail.MailAddress(smtpUser, "Altın Zamanı Web Formu"),
+                        From = new System.Net.Mail.MailAddress(smtpUser, "Hisse Fiyatları Web Formu"),
                         Subject = $"Yeni İletişim Mesajı: {model.Subject}",
                         Body = $"<strong>Gönderen Adı:</strong> {model.Name} <br/>" +
                                $"<strong>E-Posta:</strong> {model.Email} <br/><br/>" +
