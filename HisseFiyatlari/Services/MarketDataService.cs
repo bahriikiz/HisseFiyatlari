@@ -13,7 +13,7 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
     public async Task FetchAndSaveMarketDataAsync()
     {
         SetupHttpClient();
-        // API URL'sini yapılandırma dosyasından alıyoruz
+        // API URL'sini yapılandırma dosyasından alıyoruz.
         string apiUrl = configuration["MarketApi:Url"] ?? throw new InvalidOperationException("API URL yapılandırma dosyasında (appsettings.json 'MarketApi:Url') bulunamadı!");
 
         var jsonString = await FetchJsonFromApiAsync(apiUrl);
@@ -30,13 +30,13 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
         await context.SaveChangesAsync();
         await hubContext.Clients.All.SendAsync("ReceiveMarketUpdate");
     }
-
+    // Diğer yardımcı metotlar burada...
     private void SetupHttpClient()
     {
         httpClient.DefaultRequestHeaders.Clear();
         httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
     }
-
+    // API'den JSON verisini çekme ve temel doğrulama işlemi
     private async Task<string> FetchJsonFromApiAsync(string apiUrl)
     {
         var response = await httpClient.GetAsync(apiUrl);

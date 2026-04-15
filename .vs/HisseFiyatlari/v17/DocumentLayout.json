@@ -1,42 +1,10 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\",
+  "WorkspaceRootPath": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|c:\\users\\excalibur\\desktop\\altinzamani - kopya\\altinzamani\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|solutionrelative:altinzamani\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|c:\\users\\excalibur\\desktop\\altinzamani - kopya\\altinzamani\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|solutionrelative:altinzamani\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|c:\\users\\excalibur\\desktop\\altinzamani - kopya\\altinzamani\\wwwroot\\robots.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|solutionrelative:altinzamani\\wwwroot\\robots.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|c:\\users\\excalibur\\desktop\\altinzamani - kopya\\altinzamani\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|solutionrelative:altinzamani\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|c:\\users\\excalibur\\desktop\\altinzamani - kopya\\altinzamani\\services\\marketdataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|solutionrelative:altinzamani\\services\\marketdataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|c:\\users\\excalibur\\desktop\\altinzamani - kopya\\altinzamani\\hubs\\markethub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|solutionrelative:altinzamani\\hubs\\markethub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|c:\\users\\excalibur\\desktop\\altinzamani - kopya\\altinzamani\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|solutionrelative:altinzamani\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|c:\\users\\excalibur\\desktop\\altinzamani - kopya\\altinzamani\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|solutionrelative:altinzamani\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|c:\\users\\excalibur\\desktop\\altinzamani - kopya\\altinzamani\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|AltinZamani\\AltinZamani.csproj|solutionrelative:altinzamani\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\services\\marketdataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\services\\marketdataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -46,36 +14,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 2,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "_Layout.cshtml",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Views\\Shared\\_Layout.cshtml",
-              "RelativeDocumentMoniker": "AltinZamani\\Views\\Shared\\_Layout.cshtml",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Views\\Shared\\_Layout.cshtml",
-              "RelativeToolTip": "AltinZamani\\Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAAAwBAAAAAAAAAAArwB0BAABBAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-04-13T11:50:00.668Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "AdminController.cs",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Controllers\\AdminController.cs",
-              "RelativeDocumentMoniker": "AltinZamani\\Controllers\\AdminController.cs",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Controllers\\AdminController.cs",
-              "RelativeToolTip": "AltinZamani\\Controllers\\AdminController.cs",
-              "ViewState": "AgIAAIQBAAAAAAAAAADgv20BAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T09:11:07.605Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
@@ -86,93 +26,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "robots.txt",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\wwwroot\\robots.txt",
-              "RelativeDocumentMoniker": "AltinZamani\\wwwroot\\robots.txt",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\wwwroot\\robots.txt",
-              "RelativeToolTip": "AltinZamani\\wwwroot\\robots.txt",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAfAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2026-04-15T08:24:14.747Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "MarketHub.cs",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Hubs\\MarketHub.cs",
-              "RelativeDocumentMoniker": "AltinZamani\\Hubs\\MarketHub.cs",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Hubs\\MarketHub.cs",
-              "RelativeToolTip": "AltinZamani\\Hubs\\MarketHub.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-15T07:13:41.743Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\appsettings.json",
-              "RelativeDocumentMoniker": "AltinZamani\\appsettings.json",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\appsettings.json",
-              "RelativeToolTip": "AltinZamani\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-04-13T07:55:53.177Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ApplicationDbContext.cs",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Data\\ApplicationDbContext.cs",
-              "RelativeDocumentMoniker": "AltinZamani\\Data\\ApplicationDbContext.cs",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Data\\ApplicationDbContext.cs",
-              "RelativeToolTip": "AltinZamani\\Data\\ApplicationDbContext.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAwAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T12:04:16.627Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Views\\Home\\Index.cshtml",
-              "RelativeDocumentMoniker": "AltinZamani\\Views\\Home\\Index.cshtml",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Views\\Home\\Index.cshtml",
-              "RelativeToolTip": "AltinZamani\\Views\\Home\\Index.cshtml",
-              "ViewState": "AgIAACQBAAAAAAAAAAAswEQBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-30T13:09:18.865Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Program.cs",
-              "RelativeDocumentMoniker": "AltinZamani\\Program.cs",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Program.cs",
-              "RelativeToolTip": "AltinZamani\\Program.cs",
-              "ViewState": "AgIAACwAAAAAAAAAAAAswEMAAAATAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-30T11:42:42.258Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
               "Title": "MarketDataService.cs",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Services\\MarketDataService.cs",
-              "RelativeDocumentMoniker": "AltinZamani\\Services\\MarketDataService.cs",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\AltinZamani - Kopya\\AltinZamani\\Services\\MarketDataService.cs",
-              "RelativeToolTip": "AltinZamani\\Services\\MarketDataService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAkAAAAAAAAAA==",
+              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Services\\MarketDataService.cs",
+              "RelativeDocumentMoniker": "HisseFiyatlari\\Services\\MarketDataService.cs",
+              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Services\\MarketDataService.cs",
+              "RelativeToolTip": "HisseFiyatlari\\Services\\MarketDataService.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAACYAAAA8AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-15T07:14:34.17Z",
+              "WhenOpened": "2026-04-15T12:02:12.438Z",
               "EditorCaption": ""
             }
           ]
