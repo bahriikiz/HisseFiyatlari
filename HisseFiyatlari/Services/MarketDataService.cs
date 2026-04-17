@@ -9,17 +9,22 @@ namespace HisseFiyatlari.Services;
 
 public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataService> logger, HttpClient httpClient, IConfiguration configuration, IHubContext<MarketHub> hubContext)
 {
+    // Hangfire servisi her tetiklediğinde izole bir şekilde kendi değişkenlerini yönetecek.
+    private string? _yahooCrumb;
+    private string? _yahooCookie;
+
     public async Task FetchAndSaveMarketDataAsync()
     {
-        SetupHttpClient();
+        await EnsureYahooAuthAsync();
 
-        // API URL'sini yapılandırma dosyasından alıyoruz (Yahoo Finance linki olmalı)
-        string apiUrl = configuration["MarketApi:Url"] ?? throw new InvalidOperationException("API URL yapılandırma dosyasında (appsettings.json 'MarketApi:Url') bulunamadı!");
+        string baseUrl = configuration["MarketApi:Url"] ?? throw new InvalidOperationException("API URL yapılandırma dosyasında bulunamadı!");
+
+        string apiUrl = $"{baseUrl}&crumb={_yahooCrumb}";
 
         var jsonString = await FetchJsonFromApiAsync(apiUrl);
 
         using var doc = ParseJsonDocument(jsonString);
-        var fetchedData = ExtractMarketData(doc.RootElement);
+        var fetchedData = ExtractMarketData(doc.RootElement, logger);
 
         if (fetchedData.Count == 0)
         {
@@ -29,30 +34,78 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
         await context.MarketDatas.AddRangeAsync(fetchedData);
         await context.SaveChangesAsync();
 
-        // Ön yüze canlı güncelleme tetiklemesi gönderiyoruz
         await hubContext.Clients.All.SendAsync("ReceiveMarketUpdate");
     }
 
-    private void SetupHttpClient()
+    private async Task EnsureYahooAuthAsync()
     {
+        if (!string.IsNullOrEmpty(_yahooCrumb) && !string.IsNullOrEmpty(_yahooCookie))
+            return;
+
         httpClient.DefaultRequestHeaders.Clear();
         httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+
+        try
+        {
+            // Hardcoded URL uyarılarını çözmek için adresleri appsettings üzerinden çekiyoruz.
+            string cookieUrl = configuration["MarketApi:CookieUrl"] ?? throw new InvalidOperationException("Cookie URL bulunamadı!");
+            string crumbUrl = configuration["MarketApi:CrumbUrl"] ?? throw new InvalidOperationException("Crumb URL bulunamadı!");
+
+            var cookieReq = new HttpRequestMessage(HttpMethod.Get, cookieUrl);
+            var cookieRes = await httpClient.SendAsync(cookieReq);
+
+            if (cookieRes.Headers.TryGetValues("Set-Cookie", out var cookies))
+            {
+                _yahooCookie = cookies.FirstOrDefault()?.Split(';')[0];
+            }
+
+            var crumbReq = new HttpRequestMessage(HttpMethod.Get, crumbUrl);
+            if (!string.IsNullOrEmpty(_yahooCookie))
+            {
+                crumbReq.Headers.Add("Cookie", _yahooCookie);
+            }
+
+            var crumbRes = await httpClient.SendAsync(crumbReq);
+            if (crumbRes.IsSuccessStatusCode)
+            {
+                _yahooCrumb = await crumbRes.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                logger.LogWarning("Yahoo Crumb alınamadı. Yanıt: {StatusCode}", crumbRes.StatusCode);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Yahoo yetkilendirme (Cookie/Crumb) işlemi sırasında hata oluştu.");
+        }
     }
 
     private async Task<string> FetchJsonFromApiAsync(string apiUrl)
     {
-        var response = await httpClient.GetAsync(apiUrl);
+        var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
+        request.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+        request.Headers.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8");
+
+        if (!string.IsNullOrEmpty(_yahooCookie))
+        {
+            request.Headers.Add("Cookie", _yahooCookie);
+        }
+
+        var response = await httpClient.SendAsync(request);
 
         if (!response.IsSuccessStatusCode)
         {
+            _yahooCrumb = null;
+            _yahooCookie = null;
             throw new HttpRequestException($"API ulaşılamaz durumda! HTTP Kodu: {response.StatusCode}");
         }
 
         var jsonString = await response.Content.ReadAsStringAsync();
 
-        if (string.IsNullOrWhiteSpace(jsonString) || !jsonString.TrimStart().StartsWith('{'))
+        if (string.IsNullOrWhiteSpace(jsonString))
         {
-            throw new InvalidDataException("API'den JSON formatında veri gelmedi!");
+            throw new InvalidDataException("API'den veri gelmedi!");
         }
 
         return jsonString;
@@ -66,17 +119,16 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
         }
         catch (JsonException ex)
         {
-            throw new InvalidDataException($"API veriyi yarım gönderdi! Gelen Veri Uzunluğu: {jsonString.Length}", ex);
+            throw new InvalidDataException("API JSON formatı bozuk geldi!", ex);
         }
     }
 
-    private List<MarketData> ExtractMarketData(JsonElement root)
+    private static List<MarketData> ExtractMarketData(JsonElement root, ILogger logger)
     {
         var fetchedData = new List<MarketData>();
 
         try
         {
-            // Yahoo Finance JSON yapısında asıl veri quoteResponse -> result dizisinin içindedir
             if (root.TryGetProperty("quoteResponse", out var quoteResponse) &&
                 quoteResponse.TryGetProperty("result", out var resultList))
             {
@@ -91,12 +143,12 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
             }
             else
             {
-                logger.LogWarning("Yahoo Finance JSON formatı beklenenden farklı. 'quoteResponse.result' yolu bulunamadı.");
+                logger.LogWarning("Yahoo Finance JSON formatı değişmiş olabilir, 'quoteResponse.result' bulunamadı.");
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Yahoo Finance JSON verisi işlenirken bir hata oluştu!");
+            logger.LogError(ex, "Yahoo Finance JSON verisi işlenirken hata oluştu!");
         }
 
         return fetchedData;
@@ -106,10 +158,8 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
     {
         try
         {
-            // Hisse kodunu alıyoruz ve ekranda temiz görünmesi için sonundaki ".IS" takısını atıyoruz
             string symbol = item.TryGetProperty("symbol", out var symProp) ? symProp.GetString()?.Replace(".IS", "") ?? "Bilinmeyen" : "Bilinmeyen";
 
-            // Sayısal değerleri JSON elementinden doğrudan decimal ve long olarak çekiyoruz
             decimal lastPrice = item.TryGetProperty("regularMarketPrice", out var priceProp) ? priceProp.GetDecimal() : 0;
             decimal changePercentage = item.TryGetProperty("regularMarketChangePercent", out var changeProp) ? changeProp.GetDecimal() : 0;
             decimal changeAmount = item.TryGetProperty("regularMarketChange", out var changeAmtProp) ? changeAmtProp.GetDecimal() : 0;
@@ -124,15 +174,14 @@ public class MarketDataService(ApplicationDbContext context, ILogger<MarketDataS
                     LastPrice = lastPrice,
                     ChangePercentage = changePercentage,
                     ChangeAmount = changeAmount,
-                    VolumeAmount = null, // Eğer Yahoo hacmi parasal değer olarak verirse buraya eklenebilir
-                    VolumeCount = (int)(volumeCount / 1000), // Çok büyük sayıları önlemek için "Bin Lot" cinsinden kaydediyoruz
+                    VolumeCount = (int)(volumeCount / 1000),
                     RecordDate = DateTime.Now
                 };
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // Eğer bir hissenin verisinde bozukluk varsa sistemi durdurmaması için sadece o hisseyi atlıyoruz
+            Console.WriteLine($"Hata oluşan sembol JSON: {item} - Hata: {ex.Message}");
             return null;
         }
 

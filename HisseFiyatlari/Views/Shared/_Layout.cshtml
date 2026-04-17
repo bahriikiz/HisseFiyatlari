@@ -115,10 +115,12 @@
         <div class="container-fluid px-lg-5">
             <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
                 <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
-                    <div class="bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; border-radius: 4px;">
+                    @* İkon kutusunun rengini bg-primary yerine bg-success (Borsa Yeşili) yaptık *@
+                    <div class="bg-success text-white d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; border-radius: 4px;">
                         <i class="bi bi-graph-up-arrow fs-5"></i>
                     </div>
-                    <span class="kurumsal-logo-yazi">ALTIN<span class="text-warning">ZAMANI</span></span>
+                    @* Burası altın sarısı (warning) yerine yeşil (success) ve Hisse Fiyatları oldu *@
+                    <span class="kurumsal-logo-yazi">HİSSE<span class="text-success">FİYATLARI</span></span>
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"

@@ -3,44 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\views\\home\\contact.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\views\\home\\contact.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\views\\home\\privacy.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\views\\home\\privacy.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\views\\home\\page.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\views\\home\\page.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\views\\home\\about.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\views\\home\\about.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\models\\sitesetting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\models\\sitesetting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\services\\marketdataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\services\\marketdataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\services\\marketdataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\services\\marketdataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\views\\home\\about.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\views\\home\\about.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\models\\sitesetting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|solutionrelative:hissefiyatlari\\models\\sitesetting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{259C0B98-8BEE-4DC8-ADBF-7B74A9A42B28}|HisseFiyatlari\\HisseFiyatlari.csproj|c:\\users\\excalibur\\desktop\\hissefiyatlari\\hissefiyatlari\\projeadimlari.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
@@ -54,7 +38,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -66,59 +50,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Contact.cshtml",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Home\\Contact.cshtml",
-              "RelativeDocumentMoniker": "HisseFiyatlari\\Views\\Home\\Contact.cshtml",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Home\\Contact.cshtml",
-              "RelativeToolTip": "HisseFiyatlari\\Views\\Home\\Contact.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-04-15T14:27:29.158Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Privacy.cshtml",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Home\\Privacy.cshtml",
-              "RelativeDocumentMoniker": "HisseFiyatlari\\Views\\Home\\Privacy.cshtml",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Home\\Privacy.cshtml",
-              "RelativeToolTip": "HisseFiyatlari\\Views\\Home\\Privacy.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-04-15T14:27:26.184Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Page.cshtml",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Home\\Page.cshtml",
-              "RelativeDocumentMoniker": "HisseFiyatlari\\Views\\Home\\Page.cshtml",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Home\\Page.cshtml",
-              "RelativeToolTip": "HisseFiyatlari\\Views\\Home\\Page.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-04-15T14:27:22.726Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "AdminController.cs",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Controllers\\AdminController.cs",
-              "RelativeDocumentMoniker": "HisseFiyatlari\\Controllers\\AdminController.cs",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Controllers\\AdminController.cs*",
-              "RelativeToolTip": "HisseFiyatlari\\Controllers\\AdminController.cs*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAlAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-15T14:24:08.762Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 5,
               "Title": "SiteSetting.cs",
               "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Models\\SiteSetting.cs",
               "RelativeDocumentMoniker": "HisseFiyatlari\\Models\\SiteSetting.cs",
@@ -126,31 +58,17 @@
               "RelativeToolTip": "HisseFiyatlari\\Models\\SiteSetting.cs",
               "ViewState": "AgIAAA4AAAAAAAAAAAAuwCIAAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-15T14:23:43.622Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-15T14:23:43.622Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "_Layout.cshtml",
-              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Shared\\_Layout.cshtml",
-              "RelativeDocumentMoniker": "HisseFiyatlari\\Views\\Shared\\_Layout.cshtml",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Shared\\_Layout.cshtml",
-              "RelativeToolTip": "HisseFiyatlari\\Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAswAMBAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-04-15T14:17:20.762Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Home\\Index.cshtml",
               "RelativeDocumentMoniker": "HisseFiyatlari\\Views\\Home\\Index.cshtml",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Home\\Index.cshtml",
-              "RelativeToolTip": "HisseFiyatlari\\Views\\Home\\Index.cshtml",
-              "ViewState": "AgIAAJoAAAAAAAAAAAAmwL0AAAABAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Home\\Index.cshtml*",
+              "RelativeToolTip": "HisseFiyatlari\\Views\\Home\\Index.cshtml*",
+              "ViewState": "AgIAAHsAAAAAAAAAAAAhwNsAAAA9AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-04-15T14:16:21.141Z",
               "EditorCaption": ""
@@ -161,29 +79,28 @@
               "Title": "About.cshtml",
               "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Home\\About.cshtml",
               "RelativeDocumentMoniker": "HisseFiyatlari\\Views\\Home\\About.cshtml",
-              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Home\\About.cshtml*",
-              "RelativeToolTip": "HisseFiyatlari\\Views\\Home\\About.cshtml*",
+              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Views\\Home\\About.cshtml",
+              "RelativeToolTip": "HisseFiyatlari\\Views\\Home\\About.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAADkAAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-04-15T14:14:30.26Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-15T14:14:30.26Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 2,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\appsettings.json",
               "RelativeDocumentMoniker": "HisseFiyatlari\\appsettings.json",
               "ToolTip": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\appsettings.json",
               "RelativeToolTip": "HisseFiyatlari\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAADAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2026-04-15T14:09:01.189Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 6,
               "Title": "ProjeAdimlari.md",
               "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\ProjeAdimlari.md",
               "RelativeDocumentMoniker": "HisseFiyatlari\\ProjeAdimlari.md",
@@ -191,21 +108,32 @@
               "RelativeToolTip": "HisseFiyatlari\\ProjeAdimlari.md",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACsAAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
-              "WhenOpened": "2026-04-15T12:06:01.552Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-15T12:06:01.552Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 1,
               "Title": "MarketDataService.cs",
               "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Services\\MarketDataService.cs",
               "RelativeDocumentMoniker": "HisseFiyatlari\\Services\\MarketDataService.cs",
               "ToolTip": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Services\\MarketDataService.cs",
               "RelativeToolTip": "HisseFiyatlari\\Services\\MarketDataService.cs",
-              "ViewState": "AgIAAHIAAAAAAAAAAAAmwJ4AAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-15T12:02:12.438Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AdminController.cs",
+              "DocumentMoniker": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Controllers\\AdminController.cs",
+              "RelativeDocumentMoniker": "HisseFiyatlari\\Controllers\\AdminController.cs",
+              "ToolTip": "C:\\Users\\Excalibur\\Desktop\\HisseFiyatlari\\HisseFiyatlari\\Controllers\\AdminController.cs",
+              "RelativeToolTip": "HisseFiyatlari\\Controllers\\AdminController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-15T14:24:08.762Z"
             }
           ]
         }

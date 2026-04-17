@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Ana Sayfa - Canlı Borsa & Hisse Fiyatları";
     var today = DateTime.Now.Date;
+
+    // Modelin boş olma ihtimaline karşı güvenlik ve EN GÜNCEL günün verilerini alma
     var latestData = (Model != null && Model.Any()) ? Model.First().Value : new List<HisseFiyatlari.Models.MarketData>();
 
     // Özet kartlar için majör endeks ve hisseleri ayırıyoruz
@@ -10,6 +12,8 @@
     var popülerHisseler = latestData.Where(m => m.Name == "THYAO" || m.Name == "ASELS" || m.Name == "TUPRS").ToList();
 
     string aktifSembol = "₺";
+
+    // Dil Ayarları
     string lang = Context.Request.Cookies["SiteLanguage"] ?? "tr";
     bool isEn = lang == "en";
 
@@ -51,7 +55,7 @@
 @if (Model == null || !Model.Any())
 {
     <div class="alert alert-warning text-center">
-        @(isEn ? "No market data available." : "Şu anda borsa verisi bulunamadı.")
+        @(isEn ? "No market data available at the moment. Please try again later." : "Şu anda borsa verisi bulunamadı. Lütfen daha sonra tekrar deneyin.")
     </div>
 }
 else
@@ -60,7 +64,8 @@ else
         <div class="col-12">
             <div class="card shadow border-0">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold text-dark">@(isEn ? "BIST 100 Index - Last 24 Hours" : "BIST 100 Endeksi - Son 24 Saat")</h5>
+                    @* Başlığa ID ekledik ki JavaScript ile güncelleyebilelim *@
+                    <h5 id="chartTitle" class="mb-0 fw-bold text-dark">@(isEn ? "BIST 100 Index - Last 24 Hours" : "BIST 100 Endeksi - Son 24 Saat")</h5>
                     <span class="badge bg-danger shadow-sm heartbeat-animation"><i class="bi bi-broadcast me-1"></i>@(isEn ? "Live" : "Canlı Takip")</span>
                 </div>
                 <div class="card-body">
@@ -76,10 +81,12 @@ else
         {
             string colorClass = item.ChangePercentage >= 0 ? "text-success" : "text-danger";
             string iconClass = item.ChangePercentage >= 0 ? "▲" : "▼";
+            string displayName = TranslateName(item.Name);
+
             <div class="col-md-4 col-sm-6 mb-3">
                 <div class="card shadow-sm border-0 h-100 border-start border-4 @(item.ChangePercentage >= 0 ? "border-success" : "border-danger")">
                     <div class="card-body text-center">
-                        <h6 class="text-muted mb-1">@TranslateName(item.Name) (@item.Name)</h6>
+                        <h6 class="text-muted mb-1">@displayName (@item.Name)</h6>
                         <h2 class="card-text fw-bold mb-0">@aktifSembol@item.LastPrice.ToString("N2")</h2>
                         <p class="card-text @colorClass fw-bold">@iconClass %@item.ChangePercentage.ToString("N2")</p>
                     </div>
@@ -91,8 +98,14 @@ else
     @* Detaylı Liste Sekmeleri *@
     <div class="card shadow border-0 mb-4">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-            <h5 class="mb-0"><i class="bi bi-bar-chart-fill me-2"></i>@(isEn ? "Market Analysis" : "Piyasa Analizi")</h5>
-            <button onclick="exportToExcel()" class="btn btn-sm btn-success fw-bold"><i class="bi bi-file-earmark-excel me-1"></i> Excel</button>
+            <h5 class="mb-0">
+                <i class="bi bi-bar-chart-fill me-2"></i>@(isEn ? "Market Analysis (5 Days)" : "Piyasa Analizi (Son 5 Gün)")
+            </h5>
+            <div>
+                <button onclick="exportToExcel()" class="btn btn-sm btn-success fw-bold">
+                    <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                </button>
+            </div>
         </div>
 
         <div class="card-header bg-white border-bottom-0 pt-3 pb-0 px-4">
@@ -102,8 +115,14 @@ else
                 }
                 @foreach (var dateKey in Model.Keys)
                 {
+                    string tabId = $"tab-{dateKey:yyyyMMdd}";
+                    string tabLabel = GetTabLabel(dateKey);
+                    string activeClass = tabIndex == 0 ? "active" : "";
+
                     <li class="nav-item">
-                        <button class="nav-link @(tabIndex == 0 ? "active" : "") fw-bold px-4" id="tab-@dateKey.ToString("yyyyMMdd")-tab" data-bs-toggle="tab" data-bs-target="#tab-@dateKey.ToString("yyyyMMdd")" type="button">@GetTabLabel(dateKey)</button>
+                        <button class="nav-link @activeClass fw-bold px-4" id="@tabId-tab" data-bs-toggle="tab" data-bs-target="#@tabId" type="button" role="tab" aria-controls="@tabId" aria-selected="@(tabIndex == 0 ? "true" : "false")">
+                            @tabLabel
+                        </button>
                     </li>
                     tabIndex++;
                 }
@@ -111,33 +130,53 @@ else
         </div>
 
         <div class="card-body p-0">
-            <div class="tab-content">
+            <div class="tab-content" id="marketTabsContent">
                 @{
                     tabIndex = 0;
                 }
                 @foreach (var kvp in Model)
                 {
-                    <div class="tab-pane fade @(tabIndex == 0 ? "show active" : "")" id="tab-@kvp.Key.ToString("yyyyMMdd")">
+                    string tabId = $"tab-{kvp.Key:yyyyMMdd}";
+                    string activeClass = tabIndex == 0 ? "show active" : "";
+
+                    <div class="tab-pane fade @activeClass" id="@tabId" role="tabpanel" aria-labelledby="@tabId-tab">
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0">
+                            <table class="table table-hover table-striped mb-0 align-middle">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="ps-4">@(isEn ? "Stock / Ticker" : "Hisse Senedi")</th>
-                                        <th class="text-end">@(isEn ? "Price" : "Son Fiyat")</th>
-                                        <th class="text-end">@(isEn ? "Daily Change" : "Değişim")</th>
-                                        <th class="text-end pe-4">@(isEn ? "Time" : "Saat")</th>
+                                        <th class="ps-4 py-3">@(isEn ? "Asset Name" : "Hisse Senedi")</th>
+                                        <th class="py-3 text-end">@(isEn ? "Price" : "Fiyat") (@aktifSembol)</th>
+                                        <th class="py-3 text-end">@(isEn ? "Daily Change" : "Günlük Değişim")</th>
+                                        <th class="py-3 text-end pe-4">@(isEn ? "Time" : "Saat")</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var item in kvp.Value)
                                     {
-                                        <tr>
-                                            <td class="ps-4 fw-bold">@TranslateName(item.Name) <small class="text-muted">(@item.Name)</small></td>
-                                            <td class="text-end fw-bold text-primary">@item.LastPrice.ToString("N2") @aktifSembol</td>
-                                            <td class="text-end @(item.ChangePercentage >= 0 ? "text-success" : "text-danger") fw-bold">
+                                        string colorClass = item.ChangePercentage >= 0 ? "text-success" : "text-danger";
+                                        string displayName = TranslateName(item.Name);
+
+                                        @* Satırı tıklanabilir yaptık *@
+                                        <tr class="stock-row" data-symbol="@item.Name" data-title="@displayName" style="cursor: pointer;" title="@(isEn ? "Click to view chart" : "Grafiği görmek için tıklayın")">
+                                            <td class="ps-4 fw-bold text-dark">
+                                                <i class="bi bi-circle-fill text-success me-2" style="font-size: 0.6rem;"></i>
+                                                @displayName <small class="text-muted">(@item.Name)</small>
+                                            </td>
+                                            <td class="text-end fw-bold" style="color: #0d3b66;">
+                                                @item.LastPrice.ToString("N2")
+                                            </td>
+                                            <td class="text-end @colorClass fw-bold">
                                                 @(item.ChangePercentage >= 0 ? "+" : "")@item.ChangePercentage.ToString("N2")%
                                             </td>
-                                            <td class="text-end text-muted pe-4">@item.RecordDate.ToString("HH:mm")</td>
+                                            <td class="text-end text-muted pe-4">
+                                                @item.RecordDate.ToString("HH:mm")
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (!kvp.Value.Any())
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4 text-muted">@(isEn ? "No data found for this date." : "Bu tarihe ait veri bulunamadı.")</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -151,40 +190,171 @@ else
     </div>
 }
 
+@inject HisseFiyatlari.Data.ApplicationDbContext _context
+@{
+    var settings = _context.SiteSettings.FirstOrDefault();
+}
+
+@if (settings != null && !string.IsNullOrEmpty(settings.BannerAdCode))
+{
+    <div class="container text-center mb-4">
+        <div class="d-inline-block shadow-sm p-1 bg-white rounded border">
+            @Html.Raw(settings.BannerAdCode)
+        </div>
+    </div>
+}
+
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+
     <script>
+        // Grafiği hafızada tutacağımız değişken
+        let myChart = null;
+
+        // C# tarafındaki dil bilgisini JavaScript'e alıyoruz
+        const isEn = ('@isEn'.toLowerCase() === 'true');
+
+        // CANLI VERİ GÜNCELLEME (SIGNALR) BAĞLANTISI
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/marketHub")
+            .build();
+
+        connection.on("ReceiveMarketUpdate", function () {
+            console.log("Arka planda yeni veriler çekildi. Sayfa canlı olarak güncelleniyor...");
+            location.reload();
+        });
+
+        connection.start().then(function () {
+            console.log("Canlı borsa bağlantısı sağlandı.");
+        }).catch(function (err) {
+            console.error("Canlı veri bağlantı hatası: ", err.toString());
+        });
+
+        // Excel İndirme Fonksiyonu
+        function exportToExcel() {
+            const activeTabPane = document.querySelector('.tab-pane.active table');
+            const dateStr = document.querySelector('.nav-link.active').innerText.trim();
+            const wb = XLSX.utils.table_to_book(activeTabPane, { sheet: "Piyasa_Verileri" });
+            XLSX.writeFile(wb, `HisseFiyatlari_${dateStr}.xlsx`);
+        }
+
+        // Borsa Endeks Grafiği Olayları
         document.addEventListener("DOMContentLoaded", function () {
+            // Sayfa ilk açıldığında varsayılan olarak XU100'ü yükle
+            loadChart('XU100', 'BIST 100');
+
+            // Tablodaki tüm tıklanabilir satırlara tıklama dinleyicisi (event listener) ekle
+            document.querySelectorAll('.stock-row').forEach(row => {
+                row.addEventListener('click', function() {
+                    const symbol = this.getAttribute('data-symbol');
+                    const title = this.getAttribute('data-title');
+
+                    loadChart(symbol, title);
+
+                    // Tıklanan satırı vurgulamak için aktif tablo sınıfını ayarla
+                    document.querySelectorAll('.stock-row').forEach(r => r.classList.remove('table-active'));
+                    this.classList.add('table-active');
+
+                    // Mobilde veya uzun sayfalarda tıklayınca grafiğe (yukarı) yumuşak kaydır
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+        });
+
+        // Grafiği çizen ve güncelleyen ana fonksiyon
+        function loadChart(symbol, title) {
             const chartCanvas = document.getElementById('stockChart');
             if(!chartCanvas) return;
 
-            // XU100 grafiği için GetChartData action'ına istek atıyoruz
-            fetch('/Home/GetChartData?name=XU100')
+            // Başlığı dinamik olarak güncelle
+            const titleElement = document.getElementById('chartTitle');
+            if(titleElement) {
+                const timeText = isEn ? "Last 24 Hours" : "Son 24 Saat";
+                titleElement.innerText = `${title} (${symbol}) - ${timeText}`;
+            }
+
+            fetch(`/Home/GetChartData?name=${symbol}`)
                 .then(response => response.json())
                 .then(data => {
+                    if (data.length === 0) return;
+
                     const ctx = chartCanvas.getContext('2d');
-                    new Chart(ctx, {
+
+                    // Yeni grafik çizmeden önce eskisini yok et (üst üste binmeyi önler)
+                    if (myChart != null) {
+                        myChart.destroy();
+                    }
+
+                    // Verinin ilk ve son fiyatına bakarak renk belirleme (Yeşil/Kırmızı)
+                    let lineColor = '#198754'; // Yükseliş: Borsa Yeşili
+                    let bgColor = 'rgba(25, 135, 84, 0.1)';
+
+                    if (data.length > 1 && data[0].price > data[data.length - 1].price) {
+                        lineColor = '#dc3545'; // Düşüş: Kırmızı
+                        bgColor = 'rgba(220, 53, 69, 0.1)';
+                    }
+
+                    const labels = data.map(item => item.time);
+                    const prices = data.map(item => item.price);
+
+                    myChart = new Chart(ctx, {
                         type: 'line',
                         data: {
-                            labels: data.map(item => item.time),
+                            labels: labels,
                             datasets: [{
-                                label: 'BIST 100 Endeksi',
-                                data: data.map(item => item.price),
-                                borderColor: '#198754', // Borsa yeşili
-                                backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                                label: title,
+                                data: prices,
+                                borderColor: lineColor,
+                                backgroundColor: bgColor,
+                                borderWidth: 3,
                                 fill: true,
-                                tension: 0.3
+                                tension: 0.4,
+                                pointRadius: 3,
+                                pointBackgroundColor: lineColor
                             }]
                         },
-                        options: { responsive: true, maintainAspectRatio: false }
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.parsed.y.toLocaleString() + ' @aktifSembol';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    ticks: {
+                                        callback: function(value) { return value.toLocaleString(); }
+                                    }
+                                },
+                                x: { grid: { display: false } }
+                            }
+                        }
                     });
-                });
-        });
-
-        function exportToExcel() {
-            const activeTable = document.querySelector('.tab-pane.active table');
-            const wb = XLSX.utils.table_to_book(activeTable);
-            XLSX.writeFile(wb, "Borsa_Verileri.xlsx");
+                })
+                .catch(err => console.error("Grafik verisi çekilirken hata oluştu: ", err));
         }
     </script>
+
+    <style>
+        /* Canlı Yayın yanıp sönme animasyonu */
+        .heartbeat-animation {
+            animation: pulse 1.5s infinite;
+        }
+
+        @Html.Raw("@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }")
+        
+        /* Tıklanan satırı hafif gri yaparak vurgulama */
+        .table-active {
+            background-color: rgba(0, 0, 0, 0.05) !important;
+        }
+    </style>
 }
